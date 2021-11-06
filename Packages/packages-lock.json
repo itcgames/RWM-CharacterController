@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.michaelrryan.topdowncharactercontroller": {
+      "version": "file:com.michaelrryan.topdowncharactercontroller",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.2d.animation": {
       "version": "3.2.11",
       "depth": 0,
