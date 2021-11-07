@@ -161,7 +161,7 @@ namespace Tests
             Assert.AreEqual(character.transform.position, destination);
         }
 
-        // ==== Acceleration Tests ====
+        // ==== Acceleration Test ====
         [UnityTest]
         public IEnumerator Acceleration()
         {
@@ -172,6 +172,24 @@ namespace Tests
             Assert.AreNotEqual(character.GetSpeed(), character.MaxSpeed);
             yield return new WaitForSeconds(character.TimeToMaxSpeed / 2.0f);
             Assert.AreEqual(character.GetSpeed(), character.MaxSpeed);
+        }
+
+        // ==== Deceleration Test ====
+        [UnityTest]
+        public IEnumerator Deceleration()
+        {
+            character.TimeToFullStop = 0.5f;
+
+            character.MoveRight(true);
+            yield return new WaitForSeconds(0.5f);
+            Assert.AreEqual(character.GetSpeed(), character.MaxSpeed);
+
+            character.ClearPersistentInput();
+            yield return new WaitForSeconds(character.TimeToFullStop / 2.0f);
+            Assert.AreNotEqual(character.GetSpeed(), 0.0f);
+
+            yield return new WaitForSeconds(character.TimeToFullStop / 2.0f);
+            Assert.AreEqual(character.GetSpeed(), 0.0f);
         }
     }
 }
