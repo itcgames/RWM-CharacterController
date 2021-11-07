@@ -93,8 +93,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c04ef8e91389449e2f31cd53bc900, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpeed: 5
+  _tilebasedMovement: 0
+  MaxSpeed: 5
   _diagonalMovementAllowed: 1
+  _timeToMaxSpeed: 0
+  TileSize: 1
+  SecondsPerTile: 0.5
 --- !u!50 &8370774134762580273
 Rigidbody2D:
   serializedVersion: 4

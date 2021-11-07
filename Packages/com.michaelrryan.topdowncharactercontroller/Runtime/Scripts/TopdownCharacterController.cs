@@ -260,4 +260,9 @@ public class TopdownCharacterController : MonoBehaviour
     {
         _persistentInput = Vector2.zero;
     }
+
+    public float GetSpeed()
+    {
+        return _rb.velocity.magnitude;
+    }
 }
