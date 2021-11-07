@@ -1,26 +1,57 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TopdownCharacterController : MonoBehaviour
 {
-    // Properties must have a serialised counterpart to be accessible in the inspector.
+    // ==== Properties ====
 
     [SerializeField]
-    private float _maxSpeed = 5.0f;
-    public float MaxSpeed { get { return _maxSpeed; } set { _maxSpeed = value; } }
+    private bool _tilebasedMovement = false;
+    public bool TilebasedMovement { get { return _tilebasedMovement; } 
+                                    set { SetTilebasedMovement(value); } }
+
+    [Header("Regular Movement")]
+    public float MaxSpeed = 5.0f;
 
     [SerializeField]
     private bool _diagonalMovementAllowed = true;
-    public bool DiagonalMovementAllowed { get { return _diagonalMovementAllowed; } 
-                                          set { _diagonalMovementAllowed = value; } }
+    public bool DiagonalMovementAllowed { get { return _diagonalMovement; }
+                                          set { SetDiagonalMovementAllowed(value); } }
+
+    [Header("Tilebased Movement")]
+    public float TileSize = 1.0f;
+    public float SecondsPerTile = 0.5f;
+
+
+    // ==== Private Variables ====
 
     private Rigidbody2D _rb;
     private Vector2 _frameInput = Vector2.zero;
     private Vector2 _persistentInput = Vector2.zero;
     private bool _lastInputWasVertical = false;
 
-    void Start()
+    // Used internally for both regular and tilebased movement, similar to
+    //      _diagonalMovementAllowed but can change without a users intention.
+    private bool _diagonalMovement = true;
+
+    // Tilebased movement variables.
+    private Vector3 _previousPosition = Vector3.zero;
+    private Vector3 _destination = Vector3.zero;
+    private float? _secondsSinceMovementStarted = null;
+
+
+    // ==== Unity Method Overloads ====
+
+    private void OnValidate()
+    {
+        // Ensures the properties' set functions are called when one changes.
+        TilebasedMovement = _tilebasedMovement;
+        DiagonalMovementAllowed = _diagonalMovementAllowed;
+    }
+
+    private void Start()
     {
         _rb = GetComponent<Rigidbody2D>(); // The Rigidbody component.
 
@@ -39,8 +70,54 @@ public class TopdownCharacterController : MonoBehaviour
     private void Update()
     {
         CheckForInput();
-        _rb.velocity = GetInput() * _maxSpeed;
+
+        if (_tilebasedMovement)
+            UpdateTilebasedMovement();
+        else
+            UpdateRegularMovement();
+
         _frameInput = Vector2.zero;
+    }
+
+
+    // ==== Custom Methods ====
+
+    private void UpdateRegularMovement()
+    {
+        _rb.velocity = GetInput() * MaxSpeed;
+    }
+
+    private void UpdateTilebasedMovement()
+    {
+        float currentTime = Time.realtimeSinceStartup;
+
+        // If the characer is not moving.
+        if (_secondsSinceMovementStarted == null)
+        {
+            Vector2 input = GetInput();
+
+            if (input != Vector2.zero)
+            {
+                _previousPosition = transform.position;
+                _destination = transform.position + (Vector3)GetInput() * TileSize;
+                _secondsSinceMovementStarted = currentTime;
+            }
+        }
+
+        // If the character is moving across a tile.
+        else if (currentTime - _secondsSinceMovementStarted < SecondsPerTile)
+        {
+            Vector3 vectorToDest = _destination - _previousPosition;
+            float interp = (currentTime - (float)_secondsSinceMovementStarted) / SecondsPerTile;
+            transform.position = _previousPosition + vectorToDest * interp;
+        }
+
+        // If the character has reached the end of their movement.
+        else
+        {
+            transform.position = _destination;
+            _secondsSinceMovementStarted = null;
+        }
     }
 
     private void CheckForInput()
@@ -53,7 +130,7 @@ public class TopdownCharacterController : MonoBehaviour
         if (Input.GetKey(KeyCode.UpArrow)) MoveUp();
         if (Input.GetKey(KeyCode.DownArrow)) MoveDown();
 
-        if (!_diagonalMovementAllowed)
+        if (!_diagonalMovement)
         {
             // Checks for which direction was pressed last.
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -71,7 +148,8 @@ public class TopdownCharacterController : MonoBehaviour
         input.y = Mathf.Clamp(input.y, -1.0f, 1.0f);
 
         // If diagonal movement is not allowed and there's input along both axis.
-        if (!_diagonalMovementAllowed && input.x != 0.0f && input.y != 0.0f)
+        if (!_diagonalMovement 
+            && input.x != 0.0f && input.y != 0.0f)
         {
             // Nullify whichever axis was not pressed last.
             if (_lastInputWasVertical) input.x = 0.0f;
@@ -79,6 +157,27 @@ public class TopdownCharacterController : MonoBehaviour
         }
 
         return input;
+    }
+
+    private void SetTilebasedMovement(bool value)
+    {
+        _tilebasedMovement = value;
+
+        if (_tilebasedMovement)
+        {
+            if (_rb) _rb.velocity = Vector2.zero;
+            _diagonalMovement = false;
+        }
+        else
+            _diagonalMovement = _diagonalMovementAllowed;
+    }
+
+    private void SetDiagonalMovementAllowed(bool value)
+    {
+        _diagonalMovementAllowed = value;
+
+        if (!_tilebasedMovement)
+            _diagonalMovement = value;
     }
 
     public void MoveRight(bool persistent = false)
