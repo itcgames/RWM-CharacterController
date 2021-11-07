@@ -24,6 +24,8 @@ namespace Tests
             Object.Destroy(character.gameObject);
         }
 
+        // ==== Movement On Input Tests ====
+
         [UnityTest]
         public IEnumerator HorizontalMovement()
         {
@@ -127,6 +129,37 @@ namespace Tests
             Assert.AreEqual(character.transform.position.y, position.y);
             Assert.Less(character.transform.position.x, position.x);
             character.ClearPersistentInput();
+        }
+
+        
+        // ==== Tilebased Movement Tests ====
+        [UnityTest]
+        public IEnumerator TilebasedMovement()
+        {
+            // A small buffer to allow for timing based issues in the test.
+            const float TimeErrorBuffer = 0.01f;
+
+            // Sets up the character for tile based movement.
+            character.TilebasedMovement = true;
+            character.SecondsPerTile = 0.75f;
+            character.TileSize = 1.27f;
+
+            // Works out the character's position after moving one tile.
+            Vector3 destination = character.transform.position 
+                + Vector3.right * character.TileSize;
+
+            // Checks the character hasn't reached the destination halfway
+            //      through the time.
+            character.MoveRight();
+            // Waits half the movement time.
+            yield return new WaitForSeconds(character.SecondsPerTile / 2.0f); 
+            Assert.AreNotEqual(character.transform.position, destination);
+
+            // Waits another half the movement time plus an error buffer and
+            //      checks the character is at the destination.
+            yield return new WaitForSeconds(character.SecondsPerTile / 2.0f 
+                + TimeErrorBuffer);
+            Assert.AreEqual(character.transform.position, destination);
         }
     }
 }
