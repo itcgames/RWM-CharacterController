@@ -20,6 +20,11 @@ public class TopdownCharacterController : MonoBehaviour
     public bool DiagonalMovementAllowed { get { return _diagonalMovement; }
                                           set { SetDiagonalMovementAllowed(value); } }
 
+    [SerializeField]
+    private float _timeToMaxSpeed = 0.0f;
+    public float TimeToMaxSpeed { get { return _timeToMaxSpeed; }
+                                  set { SetTimeToMaxSpeed(value); } }
+
     [Header("Tilebased Movement")]
     public float TileSize = 1.0f;
     public float SecondsPerTile = 0.5f;
@@ -30,6 +35,7 @@ public class TopdownCharacterController : MonoBehaviour
     private Rigidbody2D _rb;
     private Vector2 _frameInput = Vector2.zero;
     private Vector2 _persistentInput = Vector2.zero;
+    private float _acceleration = 0.0f;
     private bool _lastInputWasVertical = false;
 
     // Used internally for both regular and tilebased movement, similar to
@@ -49,6 +55,7 @@ public class TopdownCharacterController : MonoBehaviour
         // Ensures the properties' set functions are called when one changes.
         TilebasedMovement = _tilebasedMovement;
         DiagonalMovementAllowed = _diagonalMovementAllowed;
+        TimeToMaxSpeed = _timeToMaxSpeed;
     }
 
     private void Start()
@@ -84,7 +91,28 @@ public class TopdownCharacterController : MonoBehaviour
 
     private void UpdateRegularMovement()
     {
-        _rb.velocity = GetInput() * MaxSpeed;
+        Vector2 input = GetInput();
+
+        if (input != Vector2.zero)
+        {
+            if (_timeToMaxSpeed != 0.0f)
+            {
+                // Accelerates towards the input direction.
+                _rb.velocity += input.normalized * _acceleration * Time.deltaTime;
+
+                // Checks if the character's speed is greater than the max (using
+                //      squares for performance)
+                if (_rb.velocity.sqrMagnitude > MaxSpeed * MaxSpeed)
+                    _rb.velocity = _rb.velocity.normalized * MaxSpeed;
+            }
+            else
+            {
+                // Moves at a constant speed toward to input direction.
+                _rb.velocity = input.normalized * MaxSpeed;
+            }
+        }
+        else
+            _rb.velocity = Vector2.zero;
     }
 
     private void UpdateTilebasedMovement()
@@ -159,6 +187,9 @@ public class TopdownCharacterController : MonoBehaviour
         return input;
     }
 
+
+    // ==== Setter Methods ====
+
     private void SetTilebasedMovement(bool value)
     {
         _tilebasedMovement = value;
@@ -179,6 +210,19 @@ public class TopdownCharacterController : MonoBehaviour
         if (!_tilebasedMovement)
             _diagonalMovement = value;
     }
+
+    private void SetTimeToMaxSpeed(float value)
+    {
+        _timeToMaxSpeed = value;
+
+        // Avoids a divide by zero - No need to set acceleration if
+        //      _timeToMaxSpeed is zero as it won't be used.
+        if (_timeToMaxSpeed != 0.0f)
+            _acceleration = MaxSpeed / _timeToMaxSpeed;
+    }
+
+
+    // ==== Public Methods ====
 
     public void MoveRight(bool persistent = false)
     {
