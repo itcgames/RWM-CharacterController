@@ -4,29 +4,46 @@ using UnityEngine;
 
 public class TopdownCharacterController : MonoBehaviour
 {
+    // Properties must have a serialised counterpart to be accessible in the inspector.
+
     [SerializeField]
-    private float _maxSpeed = 10.0f;
+    private float _maxSpeed = 5.0f;
     public float MaxSpeed { get { return _maxSpeed; } set { _maxSpeed = value; } }
+
+    [SerializeField]
+    private bool _diagonalMovementAllowed = true;
+    public bool DiagonalMovementAllowed { get { return _diagonalMovementAllowed; } 
+                                          set { _diagonalMovementAllowed = value; } }
 
     private Rigidbody2D _rb;
     private Vector2 _frameInput = Vector2.zero;
     private Vector2 _persistentInput = Vector2.zero;
+    private bool _lastInputWasVertical = false;
 
     void Start()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        if (!_rb) throw new UnityException(
-            "No Rigidbody2D on TopdownCharacterController " + name + ".");
+        _rb = GetComponent<Rigidbody2D>(); // The Rigidbody component.
+
+        // If no Rigidbody exists, add one.
+        if (!_rb)
+        {
+            gameObject.AddComponent<Rigidbody2D>();
+            _rb = GetComponent<Rigidbody2D>();
+        }
+
+        // Ensures the rigidbody is set up correctly.
+        _rb.isKinematic = true;
+        _rb.useFullKinematicContacts = true;
     }
 
-    public void Update()
+    private void Update()
     {
-        GetInput();
-        _rb.velocity = (_persistentInput + _frameInput) * _maxSpeed;
+        CheckForInput();
+        _rb.velocity = GetInput() * _maxSpeed;
         _frameInput = Vector2.zero;
     }
 
-    private void GetInput()
+    private void CheckForInput()
     {
         // Horizontal Input.
         if (Input.GetKey(KeyCode.LeftArrow)) MoveLeft();
@@ -35,6 +52,33 @@ public class TopdownCharacterController : MonoBehaviour
         // Vertical Input.
         if (Input.GetKey(KeyCode.UpArrow)) MoveUp();
         if (Input.GetKey(KeyCode.DownArrow)) MoveDown();
+
+        if (!_diagonalMovementAllowed)
+        {
+            // Checks for which direction was pressed last.
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+                _lastInputWasVertical = false;
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+                _lastInputWasVertical = true;
+        }
+    }
+
+    private Vector2 GetInput()
+    {
+        // Gets the combined input of persistent and frame input and clamps.
+        Vector2 input = _persistentInput + _frameInput;
+        input.x = Mathf.Clamp(input.x, -1.0f, 1.0f);
+        input.y = Mathf.Clamp(input.y, -1.0f, 1.0f);
+
+        // If diagonal movement is not allowed and there's input along both axis.
+        if (!_diagonalMovementAllowed && input.x != 0.0f && input.y != 0.0f)
+        {
+            // Nullify whichever axis was not pressed last.
+            if (_lastInputWasVertical) input.x = 0.0f;
+            else input.y = 0.0f;
+        }
+
+        return input;
     }
 
     public void MoveRight(bool persistent = false)

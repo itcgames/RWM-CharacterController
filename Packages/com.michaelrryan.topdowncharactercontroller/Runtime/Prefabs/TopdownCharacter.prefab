@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1590756327094295972}
   - component: {fileID: 8370774134762580273}
   m_Layer: 0
-  m_Name: TopdownCharacterController
+  m_Name: TopdownCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -93,7 +93,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c04ef8e91389449e2f31cd53bc900, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxSpeed: 10
+  _maxSpeed: 5
+  _diagonalMovementAllowed: 1
 --- !u!50 &8370774134762580273
 Rigidbody2D:
   serializedVersion: 4
