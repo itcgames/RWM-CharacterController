@@ -24,6 +24,7 @@ namespace Tests
             Object.Destroy(character.gameObject);
         }
 
+
         // ==== Movement On Input Tests ====
 
         [UnityTest]
@@ -41,7 +42,6 @@ namespace Tests
             character.MoveLeft(true);
             yield return new WaitForSeconds(0.5f);
             Assert.Less(character.transform.position.x, position.x);
-            character.ClearPersistentInput();
         }
 
         [UnityTest]
@@ -59,7 +59,6 @@ namespace Tests
             character.MoveDown(true);
             yield return new WaitForSeconds(0.5f);
             Assert.Less(character.transform.position.y, position.y);
-            character.ClearPersistentInput();
         }
 
         [UnityTest]
@@ -81,7 +80,6 @@ namespace Tests
             yield return new WaitForSeconds(0.5f);
             Assert.Less(character.transform.position.y, position.y);
             Assert.Less(character.transform.position.x, position.x);
-            character.ClearPersistentInput();
         }
 
         [UnityTest]
@@ -101,8 +99,10 @@ namespace Tests
             character.MoveRight(true);
             yield return new WaitForSeconds(0.5f);
             Assert.AreEqual(character.transform.position.y, position.y);
-            character.ClearPersistentInput();
         }
+
+
+        // ==== Restrict Movement to Cardinal Directions Test ====
 
         [UnityTest]
         public IEnumerator NoDiagonalMovementWhenDisabled()
@@ -128,11 +128,10 @@ namespace Tests
             yield return new WaitForSeconds(0.5f);
             Assert.AreEqual(character.transform.position.y, position.y);
             Assert.Less(character.transform.position.x, position.x);
-            character.ClearPersistentInput();
         }
 
         
-        // ==== Tilebased Movement Tests ====
+        // ==== Tilebased Movement Test ====
         [UnityTest]
         public IEnumerator TilebasedMovement()
         {
@@ -160,6 +159,19 @@ namespace Tests
             yield return new WaitForSeconds(character.SecondsPerTile / 2.0f 
                 + TimeErrorBuffer);
             Assert.AreEqual(character.transform.position, destination);
+        }
+
+        // ==== Acceleration Tests ====
+        [UnityTest]
+        public IEnumerator Acceleration()
+        {
+            character.TimeToMaxSpeed = 0.5f;
+
+            character.MoveRight(true);
+            yield return new WaitForSeconds(character.TimeToMaxSpeed / 2.0f);
+            Assert.AreNotEqual(character.GetSpeed(), character.MaxSpeed);
+            yield return new WaitForSeconds(character.TimeToMaxSpeed / 2.0f);
+            Assert.AreEqual(character.GetSpeed(), character.MaxSpeed);
         }
     }
 }
