@@ -25,6 +25,14 @@ public class TopdownCharacterController : MonoBehaviour
     public float TimeToMaxSpeed { get { return _timeToMaxSpeed; }
                                   set { SetTimeToMaxSpeed(value); } }
 
+    [SerializeField]
+    private float _timeToFullStop = 0.0f;
+    public float TimeToFullStop
+    {
+        get { return _timeToFullStop; }
+        set { SetTimeToFullStop(value); }
+    }
+
     [Header("Tilebased Movement")]
     public float TileSize = 1.0f;
     public float SecondsPerTile = 0.5f;
@@ -36,6 +44,7 @@ public class TopdownCharacterController : MonoBehaviour
     private Vector2 _frameInput = Vector2.zero;
     private Vector2 _persistentInput = Vector2.zero;
     private float _acceleration = 0.0f;
+    private float _deceleration = 0.0f;
     private bool _lastInputWasVertical = false;
 
     // Used internally for both regular and tilebased movement, similar to
@@ -56,6 +65,7 @@ public class TopdownCharacterController : MonoBehaviour
         TilebasedMovement = _tilebasedMovement;
         DiagonalMovementAllowed = _diagonalMovementAllowed;
         TimeToMaxSpeed = _timeToMaxSpeed;
+        TimeToFullStop = _timeToFullStop;
     }
 
     private void Start()
@@ -112,7 +122,18 @@ public class TopdownCharacterController : MonoBehaviour
             }
         }
         else
-            _rb.velocity = Vector2.zero;
+        {
+            if (_timeToFullStop != 0.0f)
+            {
+                Vector2 direction = _rb.velocity.normalized;
+                _rb.velocity -= direction * Mathf.Min(_deceleration * Time.deltaTime, Mathf.Abs(GetSpeed()));
+            }
+            else
+            {
+                // Brings the character to a complete stop.
+                _rb.velocity = Vector2.zero;
+            }
+        }
     }
 
     private void UpdateTilebasedMovement()
@@ -221,6 +242,15 @@ public class TopdownCharacterController : MonoBehaviour
             _acceleration = MaxSpeed / _timeToMaxSpeed;
     }
 
+    private void SetTimeToFullStop(float value)
+    {
+        _timeToFullStop = value;
+
+        // Avoids a divide by zero - No need to set deceleration if
+        //      _timeToFullStop is zero as it won't be used.
+        if (_timeToFullStop != 0.0f)
+            _deceleration = MaxSpeed / _timeToFullStop;
+    }
 
     // ==== Public Methods ====
 
