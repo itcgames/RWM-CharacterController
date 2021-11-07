@@ -24,14 +24,16 @@ public class TopdownCharacterController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>(); // The Rigidbody component.
 
-        // If no Rigidbody exists, add one with the correct setup.
+        // If no Rigidbody exists, add one.
         if (!_rb)
         {
             gameObject.AddComponent<Rigidbody2D>();
             _rb = GetComponent<Rigidbody2D>();
-            _rb.isKinematic = true;
-            _rb.useFullKinematicContacts = true;
         }
+
+        // Ensures the rigidbody is set up correctly.
+        _rb.isKinematic = true;
+        _rb.useFullKinematicContacts = true;
     }
 
     private void Update()

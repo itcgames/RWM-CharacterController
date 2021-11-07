@@ -14,12 +14,6 @@ namespace Tests
         {
             GameObject characterObj = new GameObject();
             characterObj.AddComponent<TopdownCharacterController>();
-            characterObj.AddComponent<Rigidbody2D>();
-
-            Rigidbody2D rb = characterObj.GetComponent<Rigidbody2D>();
-            rb.isKinematic = true;
-            rb.useFullKinematicContacts = true;
-
             character =
                 characterObj.GetComponent<TopdownCharacterController>();
         }
@@ -105,6 +99,33 @@ namespace Tests
             character.MoveRight(true);
             yield return new WaitForSeconds(0.5f);
             Assert.AreEqual(character.transform.position.y, position.y);
+            character.ClearPersistentInput();
+        }
+
+        [UnityTest]
+        public IEnumerator NoDiagonalMovementWhenDisabled()
+        {
+            character.DiagonalMovementAllowed = false;
+
+            // The last input is horizontal by default, so the character should
+            //      only move horizontally in these tests.
+
+            // Up + right movement.
+            Vector3 position = character.transform.position;
+            character.MoveUp(true);
+            character.MoveRight(true);
+            yield return new WaitForSeconds(0.5f);
+            Assert.AreEqual(character.transform.position.y, position.y);
+            Assert.Greater(character.transform.position.x, position.x);
+            character.ClearPersistentInput();
+
+            // Down + left movement.
+            position = character.transform.position;
+            character.MoveDown(true);
+            character.MoveLeft(true);
+            yield return new WaitForSeconds(0.5f);
+            Assert.AreEqual(character.transform.position.y, position.y);
+            Assert.Less(character.transform.position.x, position.x);
             character.ClearPersistentInput();
         }
     }
