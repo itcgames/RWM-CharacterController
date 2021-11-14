@@ -1,9 +1,9 @@
 {
-    "name": "Tests",
+    "name": "MichaelRRyan.TopdownCharacterController.Tests",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "TopdownCharacterController"
+        "MichaelRRyan.TopdownCharacterController"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
