@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TopdownCharacterController : MonoBehaviour
+public class TopdownCharacterController : MonoBehaviour, ICharacterController
 {
     // ==== Properties ====
 
@@ -40,6 +40,7 @@ public class TopdownCharacterController : MonoBehaviour
 
     // ==== Private Variables ====
 
+    private ICharacterBehaviour _behaviour;
     private Rigidbody2D _rb;
     private Vector2 _frameInput = Vector2.zero;
     private Vector2 _persistentInput = Vector2.zero;
@@ -85,7 +86,10 @@ public class TopdownCharacterController : MonoBehaviour
     }
 
     private void Update()
-    {
+    { 
+        if (_behaviour != null)
+            _behaviour.Update();
+
         CheckForInput();
 
         if (_tilebasedMovement)
@@ -252,7 +256,21 @@ public class TopdownCharacterController : MonoBehaviour
             _deceleration = MaxSpeed / _timeToFullStop;
     }
 
-    // ==== Public Methods ====
+    // ==== Public ICharacterController Methods ====
+
+    public void SetBehaviour(ICharacterBehaviour behaviour)
+    {
+        if (behaviour != null)
+        {
+            _behaviour = behaviour;
+            _behaviour.SetBehaviourUser(this);
+        }
+    }
+
+    public ICharacterBehaviour GetBehaviour()
+    {
+        return _behaviour;
+    }
 
     public void MoveRight(bool persistent = false)
     {
