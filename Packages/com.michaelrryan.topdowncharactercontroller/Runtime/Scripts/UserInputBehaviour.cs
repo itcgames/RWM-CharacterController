@@ -5,7 +5,6 @@ using UnityEngine;
 public class UserInputBehaviour : ICharacterBehaviour
 {
     ICharacterController _characterController;
-    private bool _lastInputWasVertical = false;
 
     public void SetBehaviourUser(ICharacterController characterController) =>
             _characterController = characterController;
@@ -22,13 +21,13 @@ public class UserInputBehaviour : ICharacterBehaviour
         if (Input.GetKey(KeyCode.UpArrow)) _characterController.MoveUp();
         if (Input.GetKey(KeyCode.DownArrow)) _characterController.MoveDown();
 
-        //if (!_diagonalMovement)
-        //{
-        //    // Checks for which direction was pressed last.
-        //    if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-        //        _lastInputWasVertical = false;
-        //    else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-        //        _lastInputWasVertical = true;
-        //}
+        if (!_characterController.DiagonalMovementAllowed)
+        {
+            // Checks for which direction was pressed last.
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+                _characterController.PreferHorizontal = true;
+            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+                _characterController.PreferHorizontal = false;
+        }
     }
 }
