@@ -4,6 +4,9 @@ using UnityEngine;
 
 public interface ICharacterController
 {
+    bool PreferHorizontal { get; set; }
+    bool DiagonalMovementAllowed { get; set; }
+
     void SetBehaviour(ICharacterBehaviour behaviour);
     ICharacterBehaviour GetBehaviour();
     void MoveRight(bool persistent = false);

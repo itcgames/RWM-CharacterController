@@ -53,4 +53,12 @@ public class CustomisableBehavioursTests
         yield return new WaitForSeconds(0.5f);
         Assert.Greater(character.transform.position.x, position.x);
     }
+
+    [UnityTest]
+    public IEnumerator DefaultBehaviourIsUserInput()
+    {
+        // Checks the behaviour is a user input behaviour by default.
+        Assert.IsTrue(character.GetBehaviour() is UserInputBehaviour);
+        yield return null;
+    }
 }
