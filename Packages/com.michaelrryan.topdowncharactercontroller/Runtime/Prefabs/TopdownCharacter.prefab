@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1590756327094295974}
   - component: {fileID: 1590756327094295975}
   - component: {fileID: 1590756327094295972}
+  - component: {fileID: 3401940656814232552}
   - component: {fileID: 8370774134762580273}
   m_Layer: 0
   m_Name: TopdownCharacter
@@ -96,9 +97,23 @@ MonoBehaviour:
   _tilebasedMovement: 0
   MaxSpeed: 5
   _diagonalMovementAllowed: 1
+  _preferHorizontal: 0
   _timeToMaxSpeed: 0
+  _timeToFullStop: 0
   TileSize: 1
   SecondsPerTile: 0.5
+--- !u!114 &3401940656814232552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590756327094295973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9969ad5e1bff97946a729dfbbd52c560, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &8370774134762580273
 Rigidbody2D:
   serializedVersion: 4

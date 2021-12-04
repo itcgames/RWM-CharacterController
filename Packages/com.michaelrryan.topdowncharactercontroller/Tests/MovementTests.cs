@@ -104,10 +104,10 @@ public class MovementTests
     [UnityTest]
     public IEnumerator NoDiagonalMovementWhenDisabled()
     {
+        // Giving these properties the following values, the character should
+        //      only move horizontally when moving vertically and horizontally.
         character.DiagonalMovementAllowed = false;
-
-        // The last input is horizontal by default, so the character should
-        //      only move horizontally in these tests.
+        character.PreferHorizontal = true;
 
         // Up + right movement.
         Vector3 position = character.transform.position;

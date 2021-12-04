@@ -3,49 +3,48 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using UnityEngine.SceneManagement;
 
 public class CustomisableBehavioursTests
 {
-    private TopdownCharacterController character;
-
     [SetUp]
     public void Setup()
     {
-        GameObject characterObj = new GameObject();
-        characterObj.AddComponent<TopdownCharacterController>();
-        character = characterObj.GetComponent<TopdownCharacterController>();
+        SceneManager.LoadScene("DemoScene");
     }
-
-    [TearDown]
-    public void Teardown()
-    {
-        Object.Destroy(character.gameObject);
-    }
-
 
     // A test class to be used in SlottingInNewBehaviours().
-    private class TestBehaviour : ICharacterBehaviour
+    private class TestBehaviour : CharacterBehaviour
     {
-        private ICharacterController _characterController;
-
-        public void SetBehaviourUser(ICharacterController characterController) =>
-            _characterController = characterController;
-
-        public ICharacterController GetBehaviourUser() => _characterController;
-        public void Update() => _characterController.MoveRight();
+        public void Update() => Controller.MoveRight();
     }
 
 
     [UnityTest]
     public IEnumerator SlottingInNewBehaviours()
     {
+        // Gets the character object and script.
+        GameObject characterObj = GameObject.Find("TopdownCharacter");
+        Assert.NotNull(characterObj);
+
+        var character = characterObj.GetComponent<TopdownCharacterController>();
+        Assert.NotNull(character);
+
+        // Removes the character's default behaviour.
+        Object.Destroy(characterObj.GetComponent<CharacterBehaviour>());
+
         // Sets the test character behaviour.
-        ICharacterBehaviour behaviour = new TestBehaviour();
-        character.SetBehaviour(behaviour);
+        character.gameObject.AddComponent<TestBehaviour>();
+
+        yield return new WaitForSeconds(0.1f);
+
+        // Gets the character's behaviour.
+        CharacterBehaviour behaviour = 
+            character.gameObject.GetComponent<CharacterBehaviour>();
 
         // Checks the behaviour was set correctly on both objects.
-        Assert.AreEqual(behaviour, character.GetBehaviour());
-        Assert.AreEqual(character, behaviour.GetBehaviourUser());
+        Assert.IsTrue(behaviour is TestBehaviour);
+        Assert.AreSame(character, behaviour.Controller);
 
         // Checks that the character has been moving to the right without
         //      keyboard input.
@@ -57,8 +56,16 @@ public class CustomisableBehavioursTests
     [UnityTest]
     public IEnumerator DefaultBehaviourIsUserInput()
     {
+        // Gets the character object and script.
+        GameObject characterObj = GameObject.Find("TopdownCharacter");
+        Assert.NotNull(characterObj);
+
+        // Get's the character's default behaviour.
+        CharacterBehaviour behaviour = 
+            characterObj.GetComponent<CharacterBehaviour>();
+
         // Checks the behaviour is a user input behaviour by default.
-        Assert.IsTrue(character.GetBehaviour() is UserInputBehaviour);
+        Assert.IsTrue(behaviour is UserInputBehaviour);
         yield return null;
     }
 }
