@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TopdownCharacterController : MonoBehaviour, ICharacterController
+public class TopdownCharacterController : MonoBehaviour
 {
 	// ==== Properties ====
 
