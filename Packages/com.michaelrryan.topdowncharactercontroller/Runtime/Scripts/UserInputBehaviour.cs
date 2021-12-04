@@ -2,32 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UserInputBehaviour : ICharacterBehaviour
+public class UserInputBehaviour : CharacterBehaviour
 {
-    ICharacterController _characterController;
-
-    public void SetBehaviourUser(ICharacterController characterController) =>
-            _characterController = characterController;
-
-    public ICharacterController GetBehaviourUser() => _characterController;
-
-    public void Update()
+    void Update()
     {
         // Horizontal Input.
-        if (Input.GetKey(KeyCode.LeftArrow)) _characterController.MoveLeft();
-        if (Input.GetKey(KeyCode.RightArrow)) _characterController.MoveRight();
+        if (Input.GetKey(KeyCode.LeftArrow)) Controller.MoveLeft();
+        if (Input.GetKey(KeyCode.RightArrow)) Controller.MoveRight();
 
         // Vertical Input.
-        if (Input.GetKey(KeyCode.UpArrow)) _characterController.MoveUp();
-        if (Input.GetKey(KeyCode.DownArrow)) _characterController.MoveDown();
+        if (Input.GetKey(KeyCode.UpArrow)) Controller.MoveUp();
+        if (Input.GetKey(KeyCode.DownArrow)) Controller.MoveDown();
 
-        if (!_characterController.DiagonalMovementAllowed)
+        if (!Controller.DiagonalMovementAllowed)
         {
             // Checks for which direction was pressed last.
             if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-                _characterController.PreferHorizontal = true;
+                Controller.PreferHorizontal = true;
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-                _characterController.PreferHorizontal = false;
+                Controller.PreferHorizontal = false;
         }
     }
 }
