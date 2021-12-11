@@ -249,10 +249,14 @@ public class TopdownCharacterController : MonoBehaviour
 
 	public void TakeDamage(float damage)
     {
+		// Checks the grace period has elapsed.
 		if (Time.time >= _lastHitTaken + _damageGracePeriod)
 		{
+			// Sets the new last hit taken time and takes the damage.
+			_lastHitTaken = Time.time;
 			_health -= damage;
 
+			// Checks if health has reached zero and destroys if so.
 			if (_health <= 0.0f)
 				Destroy(gameObject);
 		}
