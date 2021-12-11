@@ -7,6 +7,14 @@ using UnityEngine.SceneManagement;
 
 public class HealthTests
 {
+	// Variable and method used in DeathCallbacksAreRunOnDeath().
+	private bool _deathCallbackRun = false;
+
+	void DeathCallback()
+    {
+		_deathCallbackRun = true;
+	}
+
 	[SetUp]
 	public void Setup()
 	{
@@ -150,6 +158,20 @@ public class HealthTests
 		// Checks the character's health has not changed.
 		yield return null;
 		Assert.AreEqual(character.Health, health);
+	}
+
+	[UnityTest]
+	public IEnumerator DeathCallbacksAreRunOnDeath()
+	{
+		// Gets the character adds the callback and initialises the checker variable.
+		var character = GetCharacter();
+		character.DeathCallbacks.Add(DeathCallback);
+		_deathCallbackRun = false;
+
+		// Kills the character and checks the callback was run next frame.
+		character.TakeDamage(character.Health);
+		yield return null;
+		Assert.IsTrue(_deathCallbackRun);
 	}
 
 	private TopdownCharacterController GetCharacter()
