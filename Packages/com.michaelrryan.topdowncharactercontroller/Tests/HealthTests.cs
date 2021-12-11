@@ -116,6 +116,42 @@ public class HealthTests
 		Assert.IsTrue(renderer.enabled);
 	}
 
+	[UnityTest]
+	public IEnumerator WhitelistedTagsCanDamage()
+	{
+		// Gets the character and whitelists the "Enemy" tag.
+		var character = GetCharacter();
+		character.DamageWhitelistTags.Add("Enemy");
+
+		// Takes a copy for later.
+		float health = character.Health;
+
+		// Damages the character, passing the whitelisted tag.
+		character.TakeDamage(character.Health / 2.0f, "Enemy");
+
+		// Checks the character's health has gone down the next frame.
+		yield return null;
+		Assert.Less(character.Health, health);
+	}
+
+	[UnityTest]
+	public IEnumerator NonWhitelistedTagsCannotDamage()
+	{
+		// Gets the character and whitelists the "Enemy" tag.
+		var character = GetCharacter();
+		character.DamageWhitelistTags.Add("Enemy");
+
+		// Takes a copy for later.
+		float health = character.Health;
+
+		// Damages the character, passing the a non whitelisted tag.
+		character.TakeDamage(character.Health / 2.0f, "Friend");
+
+		// Checks the character's health has not changed.
+		yield return null;
+		Assert.AreEqual(character.Health, health);
+	}
+
 	private TopdownCharacterController GetCharacter()
 	{ 
 		// Gets the character and the script, checking both are not null.

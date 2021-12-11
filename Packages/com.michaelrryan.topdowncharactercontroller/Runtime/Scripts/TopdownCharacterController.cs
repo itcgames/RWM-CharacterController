@@ -23,6 +23,11 @@ public class TopdownCharacterController : MonoBehaviour
 									set { _gracePeriodFlashes = value; } }
 
 	[SerializeField]
+	private List<string> _damageWhitelistTags = new List<string>();
+	public List<string> DamageWhitelistTags { get { return _damageWhitelistTags; }
+											  private set { } }
+
+	[SerializeField]
 	private bool _tilebasedMovement = false;
 	public bool TilebasedMovement { get { return _tilebasedMovement; } 
 									set { SetTilebasedMovement(value); } }
@@ -279,21 +284,25 @@ public class TopdownCharacterController : MonoBehaviour
 
 	// ==== Public Methods ====
 
-	public void TakeDamage(float damage)
+	public void TakeDamage(float damage, string attackersTag = null)
     {
 		// Checks the grace period has elapsed.
 		if (Time.time >= _lastHitTaken + _damageGracePeriod)
 		{
-			// Sets the new last hit taken time and takes the damage.
-			_lastHitTaken = Time.time;
-			_health -= damage;
+			// Checks if the attackers tag is whitelisted to damage this object.
+			if (attackersTag == null || _damageWhitelistTags.Contains(attackersTag))
+			{
+				// Sets the new last hit taken time and takes the damage.
+				_lastHitTaken = Time.time;
+				_health -= damage;
 
-			// Checks if health has reached zero and destroys if so.
-			if (_health <= 0.0f)
-				Destroy(gameObject);
+				// Checks if health has reached zero and destroys if so.
+				if (_health <= 0.0f)
+					Destroy(gameObject);
 
-			// Starts the flash coroutine if not dead.
-			else StartCoroutine(FlashForGracePeriod());
+				// Starts the flash coroutine if not dead.
+				else StartCoroutine(FlashForGracePeriod());
+			}
 		}
     }
 
