@@ -8,6 +8,11 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Properties ====
 
 	[SerializeField]
+	private float _health = 5.0f;
+	public float Health { get { return _health; }
+						  set { _health = value; } }
+
+	[SerializeField]
 	private bool _tilebasedMovement = false;
 	public bool TilebasedMovement { get { return _tilebasedMovement; } 
 									set { SetTilebasedMovement(value); } }
@@ -232,6 +237,14 @@ public class TopdownCharacterController : MonoBehaviour
 	}
 
 	// ==== Public Methods ====
+
+	public void TakeDamage(float damage)
+    {
+		_health -= damage;
+
+		if (_health <= 0.0f)
+			Destroy(gameObject);
+    }
 
 	public void MoveRight(bool persistent = false)
 	{
