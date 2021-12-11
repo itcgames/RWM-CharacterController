@@ -15,7 +15,7 @@ public class TopdownCharacterController : MonoBehaviour
 	[SerializeField]
 	private float _damageGracePeriod = 0.8f;
 	public float DamageGracePeriod { get { return _damageGracePeriod; }
-									 set { _damageGracePeriod = value; } }
+									 set { SetDamageGracePeriod(value); } }
 
 	[SerializeField]
 	private int _gracePeriodFlashes = 4;
@@ -80,6 +80,7 @@ public class TopdownCharacterController : MonoBehaviour
 	private void OnValidate()
 	{
 		// Ensures the properties' set functions are called when one changes.
+		DamageGracePeriod = _damageGracePeriod;
 		TilebasedMovement = _tilebasedMovement;
 		DiagonalMovementAllowed = _diagonalMovementAllowed;
 		TimeToMaxSpeed = _timeToMaxSpeed;
@@ -103,9 +104,7 @@ public class TopdownCharacterController : MonoBehaviour
 		_rb.useFullKinematicContacts = true;
 
 		// Sets the last hit taken time so the character can immediately start taking damage.
-		_lastHitTaken = Time.time - _damageGracePeriod;
-
-		TakeDamage(0.1f);
+		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
 	}
 
 	private void Update()
@@ -230,6 +229,12 @@ public class TopdownCharacterController : MonoBehaviour
 
 
 	// ==== Setter Methods ====
+
+	private void SetDamageGracePeriod(float value)
+    {
+		_damageGracePeriod = value;
+		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
+    }
 
 	private void SetTilebasedMovement(bool value)
 	{
