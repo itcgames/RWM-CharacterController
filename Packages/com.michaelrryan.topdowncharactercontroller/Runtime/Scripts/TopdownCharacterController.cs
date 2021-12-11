@@ -13,6 +13,11 @@ public class TopdownCharacterController : MonoBehaviour
 						  set { _health = value; } }
 
 	[SerializeField]
+	private float _damageGracePeriod = 0.8f;
+	public float DamageGracePeriod { get { return _damageGracePeriod; }
+									 set { _damageGracePeriod = value; } }
+
+	[SerializeField]
 	private bool _tilebasedMovement = false;
 	public bool TilebasedMovement { get { return _tilebasedMovement; } 
 									set { SetTilebasedMovement(value); } }
@@ -52,6 +57,7 @@ public class TopdownCharacterController : MonoBehaviour
 	private Vector2 _persistentInput = Vector2.zero;
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
+	private float _lastHitTaken = 0.0f;
 
 	// Used internally for both regular and tilebased movement, similar to
 	//      _diagonalMovementAllowed but can change without a users intention.
@@ -88,6 +94,9 @@ public class TopdownCharacterController : MonoBehaviour
 		// Ensures the rigidbody is set up correctly.
 		_rb.isKinematic = true;
 		_rb.useFullKinematicContacts = true;
+
+		// Sets the last hit taken time so the character can immediately start taking damage.
+		_lastHitTaken = Time.time - _damageGracePeriod;
 	}
 
 	private void Update()
@@ -240,10 +249,13 @@ public class TopdownCharacterController : MonoBehaviour
 
 	public void TakeDamage(float damage)
     {
-		_health -= damage;
+		if (Time.time >= _lastHitTaken + _damageGracePeriod)
+		{
+			_health -= damage;
 
-		if (_health <= 0.0f)
-			Destroy(gameObject);
+			if (_health <= 0.0f)
+				Destroy(gameObject);
+		}
     }
 
 	public void MoveRight(bool persistent = false)
