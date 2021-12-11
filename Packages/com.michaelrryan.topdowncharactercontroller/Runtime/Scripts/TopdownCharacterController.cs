@@ -15,7 +15,12 @@ public class TopdownCharacterController : MonoBehaviour
 	[SerializeField]
 	private float _damageGracePeriod = 0.8f;
 	public float DamageGracePeriod { get { return _damageGracePeriod; }
-									 set { _damageGracePeriod = value; } }
+									 set { SetDamageGracePeriod(value); } }
+
+	[SerializeField]
+	private int _gracePeriodFlashes = 4;
+	public int GracePeriodFlashes { get { return _gracePeriodFlashes; }
+									set { _gracePeriodFlashes = value; } }
 
 	[SerializeField]
 	private bool _tilebasedMovement = false;
@@ -53,6 +58,7 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Private Variables ====
 
 	private Rigidbody2D _rb;
+	private Renderer _renderer;
 	private Vector2 _frameInput = Vector2.zero;
 	private Vector2 _persistentInput = Vector2.zero;
 	private float _acceleration = 0.0f;
@@ -74,6 +80,7 @@ public class TopdownCharacterController : MonoBehaviour
 	private void OnValidate()
 	{
 		// Ensures the properties' set functions are called when one changes.
+		DamageGracePeriod = _damageGracePeriod;
 		TilebasedMovement = _tilebasedMovement;
 		DiagonalMovementAllowed = _diagonalMovementAllowed;
 		TimeToMaxSpeed = _timeToMaxSpeed;
@@ -82,7 +89,8 @@ public class TopdownCharacterController : MonoBehaviour
 
 	private void Start()
 	{
-		_rb = GetComponent<Rigidbody2D>(); // The Rigidbody component.
+		_renderer = GetComponent<Renderer>();
+		_rb = GetComponent<Rigidbody2D>();
 
 		// If no Rigidbody exists, add one.
 		if (!_rb)
@@ -96,7 +104,7 @@ public class TopdownCharacterController : MonoBehaviour
 		_rb.useFullKinematicContacts = true;
 
 		// Sets the last hit taken time so the character can immediately start taking damage.
-		_lastHitTaken = Time.time - _damageGracePeriod;
+		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
 	}
 
 	private void Update()
@@ -201,8 +209,32 @@ public class TopdownCharacterController : MonoBehaviour
 		return input;
 	}
 
+	private IEnumerator FlashForGracePeriod()
+    {
+		yield return null;
+
+		// Checks there's a renderer as the character can't flash without it.
+		if (_renderer)
+		{
+			// Works out the number of iterations to flash for.
+			int iterations = _gracePeriodFlashes * 2;
+			for (int i = 0; i < iterations; ++i)
+			{
+				// Toggles the visibility and waits.
+				_renderer.enabled = !_renderer.enabled;
+				yield return new WaitForSeconds(_damageGracePeriod / iterations);
+			}
+		}
+	}
+
 
 	// ==== Setter Methods ====
+
+	private void SetDamageGracePeriod(float value)
+    {
+		_damageGracePeriod = value;
+		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
+    }
 
 	private void SetTilebasedMovement(bool value)
 	{
@@ -259,6 +291,9 @@ public class TopdownCharacterController : MonoBehaviour
 			// Checks if health has reached zero and destroys if so.
 			if (_health <= 0.0f)
 				Destroy(gameObject);
+
+			// Starts the flash coroutine if not dead.
+			else StartCoroutine(FlashForGracePeriod());
 		}
     }
 

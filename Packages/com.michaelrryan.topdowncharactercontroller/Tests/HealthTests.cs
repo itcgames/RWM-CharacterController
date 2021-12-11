@@ -7,73 +7,123 @@ using UnityEngine.SceneManagement;
 
 public class HealthTests
 {
-    [SetUp]
-    public void Setup()
-    {
-        SceneManager.LoadScene("DemoScene");
-    }
+	[SetUp]
+	public void Setup()
+	{
+		SceneManager.LoadScene("DemoScene");
+	}
 
-    [UnityTest]
-    public IEnumerator CharacterDiesOnZeroHealth()
-    {
-        // Gets the character and the script, checking both are not null.
-        GameObject playerObj = GameObject.Find("TopdownCharacter");
-        Assert.NotNull(playerObj);
-        var player = playerObj.GetComponent<TopdownCharacterController>();
-        Assert.NotNull(player);
+	[UnityTest]
+	public IEnumerator CharacterDiesOnZeroHealth()
+	{
+		// Damages the character equal to its health, waits a frame and
+		//      checks they are now null.
+		var character = GetCharacter();
+		character.TakeDamage(character.Health);
+		yield return null;
 
-        // Damages the character equal to its health, waits a frame and
-        //      checks they are now null.
-        player.TakeDamage(player.Health);
-        yield return null;
-        playerObj = GameObject.Find("TopdownCharacter");
-        Assert.Null(playerObj);
-    }
+		GameObject characterObj = GameObject.Find("TopdownCharacter");
+		Assert.Null(characterObj);
+	}
 
-    [UnityTest]
-    public IEnumerator NoDamageTakenDuringGracePeriod()
-    {
-        // Gets the character and the script, checking both are not null.
-        GameObject playerObj = GameObject.Find("TopdownCharacter");
-        Assert.NotNull(playerObj);
-        var player = playerObj.GetComponent<TopdownCharacterController>();
-        Assert.NotNull(player);
+	[UnityTest]
+	public IEnumerator NoDamageTakenDuringGracePeriod()
+	{
+		var character = GetCharacter();
 
-        // Damages the character equal to half its health and stores the
-        //      remaining health.
-        player.TakeDamage(player.Health / 2.0f);
-        float health = player.Health;
+		// Stashes these to avoid interfering with the wait time.
+		float waitTime = character.DamageGracePeriod * 0.25f;
+		float halfHealth = character.Health * 0.5f;
 
-        // Waits half the grace period and tries to attack again.
-        yield return new WaitForSeconds(player.DamageGracePeriod / 2.0f);
-        player.TakeDamage(player.Health / 2.0f);
+		// Damages the character equal to half its health and stores the
+		//      remaining health.
+		character.TakeDamage(halfHealth);
+		float health = character.Health;
 
-        // Checks that the health has not changed.
-        Assert.AreEqual(health, player.Health);
-    }
+		// Waits half the grace period and tries to attack again.
+		yield return new WaitForSeconds(waitTime);
+		character.TakeDamage(halfHealth);
 
-    [UnityTest]
-    public IEnumerator DamageCanBeDoneAfterGracePeriod()
-    {
-        // An added margin to avoid floating point errors.
-        const float ERROR_MARGIN = 0.05f;
+		// Checks that the health has not changed.
+		Assert.AreEqual(health, character.Health);
+	}
 
-        // Gets the character and the script, checking both are not null.
-        GameObject playerObj = GameObject.Find("TopdownCharacter");
-        Assert.NotNull(playerObj);
-        var player = playerObj.GetComponent<TopdownCharacterController>();
-        Assert.NotNull(player);
+	[UnityTest]
+	public IEnumerator DamageCanBeDoneAfterGracePeriod()
+	{
+		// An added margin to avoid floating point errors.
+		const float ERROR_MARGIN = 0.05f;
 
-        // Damages the character equal to half its health.
-        player.TakeDamage(player.Health / 2.0f);
+		// Damages the character equal to half its health.
+		var character = GetCharacter();
+		character.TakeDamage(character.Health / 2.0f);
 
-        // Waits for the grace period to end and tries to attack again.
-        yield return new WaitForSeconds(player.DamageGracePeriod + ERROR_MARGIN);
-        player.TakeDamage(player.Health);
+		// Waits for the grace period to end and tries to attack again.
+		yield return new WaitForSeconds(character.DamageGracePeriod + ERROR_MARGIN);
+		character.TakeDamage(character.Health);
 
-        // Waits a frame and checks the character is dead.
-        yield return null;
-        playerObj = GameObject.Find("TopdownCharacter");
-        Assert.Null(playerObj);
-    }
+		// Waits a frame and checks the character is dead.
+		yield return null;
+		GameObject characterObj = GameObject.Find("TopdownCharacter");
+		Assert.Null(characterObj);
+	}
+
+	[UnityTest]
+	public IEnumerator FlashesDuringGracePeriod()
+	{
+		// An added margin to avoid floating point errors.
+		const float ERROR_MARGIN = 0.05f;
+
+		// Sets the properties to be used.
+		float gracePeriod = 1.0f;
+		int flashes = 2;
+
+		// Stash for later to avoid interfering with the wait time.
+		float flashLength = gracePeriod / (flashes * 2);
+		float halfFlash = flashLength * 0.5f;
+
+		// Gets the character and sets up the fields.
+		var character = GetCharacter();
+		character.DamageGracePeriod = gracePeriod;
+		character.GracePeriodFlashes = flashes;
+
+		// Takes reference to the character's renderer and ensures its not null.
+		Renderer renderer = character.GetComponent<Renderer>();
+		Assert.IsNotNull(renderer);
+
+		// Damage the character and checks the character is invisible less than
+		//      one flash length later.
+		character.TakeDamage(character.Health / 2.0f);
+		yield return new WaitForSeconds(halfFlash);
+		Assert.IsFalse(renderer.enabled);
+
+		// Checks the character is visible again after the first flash.
+		yield return new WaitForSeconds(halfFlash + ERROR_MARGIN);
+		Assert.IsTrue(renderer.enabled);
+	}
+
+	[UnityTest]
+	public IEnumerator IsVisibleAfterGracePeriod()
+	{
+		// Gets the character and the renderer.
+		var character = GetCharacter();
+		Renderer renderer = character.GetComponent<Renderer>();
+		Assert.IsNotNull(renderer);
+
+		// Damages the character and checks its visible after the grace period.
+		character.TakeDamage(character.Health / 2.0f);
+		yield return new WaitForSeconds(character.DamageGracePeriod);
+		Assert.IsTrue(renderer.enabled);
+	}
+
+	private TopdownCharacterController GetCharacter()
+	{ 
+		// Gets the character and the script, checking both are not null.
+		GameObject characterObj = GameObject.Find("TopdownCharacter");
+		Assert.NotNull(characterObj);
+		var character = characterObj.GetComponent<TopdownCharacterController>();
+		Assert.NotNull(character);
+
+		return character;
+	}
 }
