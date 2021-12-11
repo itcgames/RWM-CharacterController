@@ -7,6 +7,8 @@ public class TopdownCharacterController : MonoBehaviour
 {
 	// ==== Properties ====
 
+	[Header("Health & Damage")]
+
 	[SerializeField]
 	private float _health = 5.0f;
 	public float Health { get { return _health; }
@@ -27,6 +29,10 @@ public class TopdownCharacterController : MonoBehaviour
 	public List<string> DamageWhitelistTags { get { return _damageWhitelistTags; }
 											  private set { } }
 
+	public delegate void DeathCallback();
+	public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
+
+	[Header("Movement")]
 	[SerializeField]
 	private bool _tilebasedMovement = false;
 	public bool TilebasedMovement { get { return _tilebasedMovement; } 
@@ -215,7 +221,7 @@ public class TopdownCharacterController : MonoBehaviour
 	}
 
 	private IEnumerator FlashForGracePeriod()
-    {
+	{
 		yield return null;
 
 		// Checks there's a renderer as the character can't flash without it.
@@ -236,10 +242,10 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Setter Methods ====
 
 	private void SetDamageGracePeriod(float value)
-    {
+	{
 		_damageGracePeriod = value;
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
-    }
+	}
 
 	private void SetTilebasedMovement(bool value)
 	{
@@ -285,7 +291,7 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Public Methods ====
 
 	public void TakeDamage(float damage, string attackersTag = null)
-    {
+	{
 		// Checks the grace period has elapsed.
 		if (Time.time >= _lastHitTaken + _damageGracePeriod)
 		{
@@ -298,13 +304,15 @@ public class TopdownCharacterController : MonoBehaviour
 
 				// Checks if health has reached zero and destroys if so.
 				if (_health <= 0.0f)
+				{
+					foreach (var callback in DeathCallbacks) callback();
 					Destroy(gameObject);
-
+				}
 				// Starts the flash coroutine if not dead.
 				else StartCoroutine(FlashForGracePeriod());
 			}
 		}
-    }
+	}
 
 	public void MoveRight(bool persistent = false)
 	{
