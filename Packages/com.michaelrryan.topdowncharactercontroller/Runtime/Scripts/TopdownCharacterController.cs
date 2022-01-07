@@ -32,6 +32,11 @@ public class TopdownCharacterController : MonoBehaviour
 	public delegate void DeathCallback();
 	public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
 
+	[Header("Combat")]
+
+	public float AttackDamage = 1.0f;
+	public float AttackRadius = 1.0f;
+
 	[Header("Movement")]
 	[SerializeField]
 	private bool _tilebasedMovement = false;
@@ -295,13 +300,18 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Public Methods ====
 
 	public void Attack()
-    {
-		// The centre of the attack radius.
-		Vector2 attackPosition = (Vector2)transform.position + _direction; // * _attackRadius;
-		Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, 5.0f /* _attackRadius */);
+	{
+		// Finds all colliders within a radius in front of the character.
+		Vector2 attackPosition = (Vector2)transform.position + _direction * AttackRadius;
+		Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
 
-		// Check through colliders and damage any character controllers.
-    }
+		// Check through colliders and damages any character controllers.
+		foreach (Collider2D collider in colliders)
+		{
+			var character = collider.GetComponent<TopdownCharacterController>();
+			if (character) character.TakeDamage(AttackDamage, tag);
+		}
+	}
 
 	public void TakeDamage(float damage, string attackersTag = null)
 	{
