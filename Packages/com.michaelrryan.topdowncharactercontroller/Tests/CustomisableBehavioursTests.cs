@@ -10,7 +10,7 @@ public class CustomisableBehavioursTests
     [SetUp]
     public void Setup()
     {
-        SceneManager.LoadScene("DemoScene");
+        SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
     }
 
     // A test class to be used in SlottingInNewBehaviours().
@@ -22,16 +22,12 @@ public class CustomisableBehavioursTests
 
     [UnityTest]
     public IEnumerator SlottingInNewBehaviours()
-    {
-        // Gets the character object and script.
-        GameObject characterObj = GameObject.Find("TopdownCharacter");
-        Assert.NotNull(characterObj);
-
-        var character = characterObj.GetComponent<TopdownCharacterController>();
+    { 
+        TopdownCharacterController character = TestUtilities.GetDefaultCharacter();
         Assert.NotNull(character);
 
         // Removes the character's default behaviour.
-        Object.Destroy(characterObj.GetComponent<CharacterBehaviour>());
+        Object.Destroy(character.GetComponent<CharacterBehaviour>());
 
         // Sets the test character behaviour.
         character.gameObject.AddComponent<TestBehaviour>();
@@ -56,13 +52,12 @@ public class CustomisableBehavioursTests
     [UnityTest]
     public IEnumerator DefaultBehaviourIsUserInput()
     {
-        // Gets the character object and script.
-        GameObject characterObj = GameObject.Find("TopdownCharacter");
-        Assert.NotNull(characterObj);
+        TopdownCharacterController character = TestUtilities.GetDefaultCharacter();
+        Assert.NotNull(character);
 
         // Get's the character's default behaviour.
-        CharacterBehaviour behaviour = 
-            characterObj.GetComponent<CharacterBehaviour>();
+        CharacterBehaviour behaviour =
+            character.GetComponent<CharacterBehaviour>();
 
         // Checks the behaviour is a user input behaviour by default.
         Assert.IsTrue(behaviour is UserInputBehaviour);

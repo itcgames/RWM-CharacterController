@@ -11,14 +11,14 @@ public class HealthTests
 	private bool _deathCallbackRun = false;
 
 	void DeathCallback()
-    {
+	{
 		_deathCallbackRun = true;
 	}
 
 	[SetUp]
 	public void Setup()
 	{
-		SceneManager.LoadScene("DemoScene");
+		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
 	}
 
 	[UnityTest]
@@ -26,18 +26,17 @@ public class HealthTests
 	{
 		// Damages the character equal to its health, waits a frame and
 		//      checks they are now null.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		character.TakeDamage(character.Health);
 		yield return null;
 
-		GameObject characterObj = GameObject.Find("TopdownCharacter");
-		Assert.Null(characterObj);
+		Assert.Null(GameObject.Find(TestUtilities.DEFAULT_CHARACTER_NAME));
 	}
 
 	[UnityTest]
 	public IEnumerator NoDamageTakenDuringGracePeriod()
 	{
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 
 		// Stashes these to avoid interfering with the wait time.
 		float waitTime = character.DamageGracePeriod * 0.25f;
@@ -63,7 +62,7 @@ public class HealthTests
 		const float ERROR_MARGIN = 0.05f;
 
 		// Damages the character equal to half its health.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		character.TakeDamage(character.Health / 2.0f);
 
 		// Waits for the grace period to end and tries to attack again.
@@ -91,7 +90,7 @@ public class HealthTests
 		float halfFlash = flashLength * 0.5f;
 
 		// Gets the character and sets up the fields.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		character.DamageGracePeriod = gracePeriod;
 		character.GracePeriodFlashes = flashes;
 
@@ -114,7 +113,7 @@ public class HealthTests
 	public IEnumerator IsVisibleAfterGracePeriod()
 	{
 		// Gets the character and the renderer.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		Renderer renderer = character.GetComponent<Renderer>();
 		Assert.IsNotNull(renderer);
 
@@ -128,7 +127,7 @@ public class HealthTests
 	public IEnumerator WhitelistedTagsCanDamage()
 	{
 		// Gets the character and whitelists the "Enemy" tag.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		character.DamageWhitelistTags.Add("Enemy");
 
 		// Takes a copy for later.
@@ -146,7 +145,7 @@ public class HealthTests
 	public IEnumerator NonWhitelistedTagsCannotDamage()
 	{
 		// Gets the character and whitelists the "Enemy" tag.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		character.DamageWhitelistTags.Add("Enemy");
 
 		// Takes a copy for later.
@@ -164,7 +163,7 @@ public class HealthTests
 	public IEnumerator DeathCallbacksAreRunOnDeath()
 	{
 		// Gets the character adds the callback and initialises the checker variable.
-		var character = GetCharacter();
+		var character = TestUtilities.GetDefaultCharacter();
 		character.DeathCallbacks.Add(DeathCallback);
 		_deathCallbackRun = false;
 
@@ -172,16 +171,5 @@ public class HealthTests
 		character.TakeDamage(character.Health);
 		yield return null;
 		Assert.IsTrue(_deathCallbackRun);
-	}
-
-	private TopdownCharacterController GetCharacter()
-	{ 
-		// Gets the character and the script, checking both are not null.
-		GameObject characterObj = GameObject.Find("TopdownCharacter");
-		Assert.NotNull(characterObj);
-		var character = characterObj.GetComponent<TopdownCharacterController>();
-		Assert.NotNull(character);
-
-		return character;
 	}
 }
