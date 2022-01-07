@@ -8,7 +8,7 @@ public class TestUtilities
 	public const string DEFAULT_CHARACTER_NAME = "Player";
 	public const string DEFAULT_SCENE_NAME = "DemoScene";
 
-	public static TopdownCharacterController GetCharacter(string name)
+	public static TopdownCharacterController GetCharacterByName(string name)
 	{
 		// Finds the character by name and ensures it's not null.
 		GameObject characterObj = GameObject.Find(name);
@@ -23,7 +23,7 @@ public class TestUtilities
 
 	public static TopdownCharacterController GetDefaultCharacter()
 	{
-		return GetCharacter(DEFAULT_CHARACTER_NAME);
+		return GetCharacterByName(DEFAULT_CHARACTER_NAME);
 	}
 
 	public static string GetDefaultSceneName()
