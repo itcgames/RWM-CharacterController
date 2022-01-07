@@ -10,11 +10,14 @@ public class TestUtilities
 
 	public static TopdownCharacterController GetCharacter(string name)
 	{
+		// Finds the character by name and ensures it's not null.
 		GameObject characterObj = GameObject.Find(name);
 		Assert.NotNull(characterObj);
 
+		// Finds the character objects and ensures it's not null.
 		var character = characterObj.GetComponent<TopdownCharacterController>();
 		Assert.NotNull(character);
+
 		return character;
 	}
 

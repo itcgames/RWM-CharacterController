@@ -35,7 +35,7 @@ public class TopdownCharacterController : MonoBehaviour
 	[Header("Combat")]
 
 	public float AttackDamage = 1.0f;
-	public float AttackRadius = 1.0f;
+	public float AttackRadius = 0.5f;
 
 	[Header("Movement")]
 	[SerializeField]
