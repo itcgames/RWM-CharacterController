@@ -22,5 +22,7 @@ public class UserInputBehaviour : CharacterBehaviour
             else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
                 Controller.PreferHorizontal = false;
         }
+
+        if (Input.GetKey(KeyCode.C)) Controller.Attack();
     }
 }

@@ -72,6 +72,7 @@ public class TopdownCharacterController : MonoBehaviour
 	private Renderer _renderer;
 	private Vector2 _frameInput = Vector2.zero;
 	private Vector2 _persistentInput = Vector2.zero;
+	private Vector2 _direction = Vector2.down;
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
 	private float _lastHitTaken = 0.0f;
@@ -137,10 +138,12 @@ public class TopdownCharacterController : MonoBehaviour
 
 		if (input != Vector2.zero)
 		{
+			_direction = input.normalized;
+
 			if (_timeToMaxSpeed != 0.0f)
 			{
 				// Accelerates towards the input direction.
-				_rb.velocity += input.normalized * _acceleration * Time.deltaTime;
+				_rb.velocity += _direction * _acceleration * Time.deltaTime;
 
 				// Checks if the character's speed is greater than the max (using
 				//      squares for performance)
@@ -150,7 +153,7 @@ public class TopdownCharacterController : MonoBehaviour
 			else
 			{
 				// Moves at a constant speed toward to input direction.
-				_rb.velocity = input.normalized * MaxSpeed;
+				_rb.velocity = _direction * MaxSpeed;
 			}
 		}
 		else
@@ -180,8 +183,9 @@ public class TopdownCharacterController : MonoBehaviour
 			if (input != Vector2.zero)
 			{
 				_previousPosition = transform.position;
-				_destination = transform.position + (Vector3)GetInput() * TileSize;
+				_destination = transform.position + (Vector3)input * TileSize;
 				_secondsSinceMovementStarted = currentTime;
+				_direction = input.normalized;
 			}
 		}
 
@@ -289,6 +293,15 @@ public class TopdownCharacterController : MonoBehaviour
 	}
 
 	// ==== Public Methods ====
+
+	public void Attack()
+    {
+		// The centre of the attack radius.
+		Vector2 attackPosition = (Vector2)transform.position + _direction; // * _attackRadius;
+		Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, 5.0f /* _attackRadius */);
+
+		// Check through colliders and damage any character controllers.
+    }
 
 	public void TakeDamage(float damage, string attackersTag = null)
 	{
