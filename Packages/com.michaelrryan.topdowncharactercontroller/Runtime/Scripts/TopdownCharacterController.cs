@@ -37,6 +37,11 @@ public class TopdownCharacterController : MonoBehaviour
 	public float AttackDamage = 1.0f;
 	public float AttackRadius = 0.5f;
 
+	[SerializeField]
+	private float _attackCooldown = 0.5f;
+	public float AttackCooldown { get { return _attackCooldown; }
+								  set { SetAttackCooldown(value); } }
+
 	[Header("Movement")]
 	[SerializeField]
 	private bool _tilebasedMovement = false;
@@ -81,6 +86,7 @@ public class TopdownCharacterController : MonoBehaviour
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
 	private float _lastHitTaken = 0.0f;
+	private float _lastAttackTime = 0.0f;
 
 	// Used internally for both regular and tilebased movement, similar to
 	//      _diagonalMovementAllowed but can change without a users intention.
@@ -122,6 +128,9 @@ public class TopdownCharacterController : MonoBehaviour
 
 		// Sets the last hit taken time so the character can immediately start taking damage.
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
+
+		// Sets the last attack time so the character can immediately start attacking.
+		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
 	}
 
 	private void Update()
@@ -256,6 +265,12 @@ public class TopdownCharacterController : MonoBehaviour
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
 	}
 
+	private void SetAttackCooldown(float value)
+    {
+		_attackCooldown = value;
+		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
+    }
+
 	private void SetTilebasedMovement(bool value)
 	{
 		_tilebasedMovement = value;
@@ -301,15 +316,21 @@ public class TopdownCharacterController : MonoBehaviour
 
 	public void Attack()
 	{
-		// Finds all colliders within a radius in front of the character.
-		Vector2 attackPosition = (Vector2)transform.position + _direction * AttackRadius;
-		Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
-
-		// Check through colliders and damages any character controllers.
-		foreach (Collider2D collider in colliders)
+		// Checks the attack cooldown has expired before attacking.
+		if (Time.time >= _lastAttackTime + _attackCooldown)
 		{
-			var character = collider.GetComponent<TopdownCharacterController>();
-			if (character) character.TakeDamage(AttackDamage, tag);
+			_lastAttackTime = Time.time;
+
+			// Finds all colliders within a radius in front of the character.
+			Vector2 attackPosition = (Vector2)transform.position + _direction * AttackRadius;
+			Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
+
+			// Check through colliders and damages any character controllers.
+			foreach (Collider2D collider in colliders)
+			{
+				var character = collider.GetComponent<TopdownCharacterController>();
+				if (character) character.TakeDamage(AttackDamage, tag);
+			}
 		}
 	}
 
