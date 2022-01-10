@@ -121,6 +121,38 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &65605173 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1590756327094295973, guid: 30f37926d62f56143b7c78120f5ace8a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1590756327217219393}
+  m_PrefabAsset: {fileID: 0}
+--- !u!61 &65605174
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65605173}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +245,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
+      propertyPath: ThornsDamage
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
+        type: 3}
       propertyPath: _timeToFullStop
       value: 0.5
       objectReference: {fileID: 0}
@@ -225,11 +262,6 @@ PrefabInstance:
         type: 3}
       propertyPath: _preferHorizontal
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
-        type: 3}
-      propertyPath: _damageGracePeriod
-      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
@@ -249,6 +281,11 @@ PrefabInstance:
     - target: {fileID: 1590756327094295973, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
       propertyPath: m_Name
+      value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 1590756327094295973, guid: 30f37926d62f56143b7c78120f5ace8a,
+        type: 3}
+      propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 1590756327094295977, guid: 30f37926d62f56143b7c78120f5ace8a,
@@ -350,11 +387,6 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
-      propertyPath: AttackRadius
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
-        type: 3}
       propertyPath: _timeToFullStop
       value: 0.25
       objectReference: {fileID: 0}
@@ -370,13 +402,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
-      propertyPath: _damageGracePeriod
-      value: 0.8
+      propertyPath: _tilebasedMovement
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
-      propertyPath: _tilebasedMovement
-      value: 0
+      propertyPath: _damageWhitelistTags.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
+        type: 3}
+      propertyPath: _damageWhitelistTags.Array.data[0]
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 1590756327094295973, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}

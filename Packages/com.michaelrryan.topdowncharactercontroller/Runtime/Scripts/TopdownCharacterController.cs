@@ -42,6 +42,8 @@ public class TopdownCharacterController : MonoBehaviour
 	public float AttackCooldown { get { return _attackCooldown; }
 								  set { SetAttackCooldown(value); } }
 
+	public float ThornsDamage = 0.0f;
+
 	[Header("Movement")]
 	[SerializeField]
 	private bool _tilebasedMovement = false;
@@ -122,6 +124,8 @@ public class TopdownCharacterController : MonoBehaviour
 			_rb = GetComponent<Rigidbody2D>();
 		}
 
+		_rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
+
 		// Ensures the rigidbody is set up correctly.
 		_rb.isKinematic = true;
 		_rb.useFullKinematicContacts = true;
@@ -141,6 +145,19 @@ public class TopdownCharacterController : MonoBehaviour
 			UpdateRegularMovement();
 
 		_frameInput = Vector2.zero;
+	}
+
+	private void OnCollisionStay2D(Collision2D collision)
+	{
+		if (ThornsDamage != 0.0f)
+		{
+			var character = 
+				collision.collider.GetComponent<TopdownCharacterController>();
+
+			// If a character component was retrieved, damage it.
+			if (character)
+				character.TakeDamage(ThornsDamage, tag);
+		}
 	}
 
 
@@ -266,10 +283,10 @@ public class TopdownCharacterController : MonoBehaviour
 	}
 
 	private void SetAttackCooldown(float value)
-    {
+	{
 		_attackCooldown = value;
 		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
-    }
+	}
 
 	private void SetTilebasedMovement(bool value)
 	{

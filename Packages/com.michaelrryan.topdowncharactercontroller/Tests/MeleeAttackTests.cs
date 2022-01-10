@@ -104,4 +104,32 @@ public class MeleeAttackTests
 		// Checks the enemy's health has not decreased further.
 		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE * 2.0f, enemy.Health);
 	}
+
+	[UnityTest]
+	public IEnumerator CollidingCharactersTakeThornsDamage()
+	{
+		// SETS UP THE CHARACTERS.
+		const float HEALTH = 2.0f;
+		const float DAMAGE_GRACE_PERIOD = 0.2f;
+		const float ENEMY_THORNS_DAMAGE = 0.5f;
+
+		// Gets the characters.
+		var player = TestUtilities.GetDefaultCharacter();
+		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
+
+		// Sets the player and enemy properties.
+		player.Health = HEALTH;
+		player.DamageGracePeriod = DAMAGE_GRACE_PERIOD;
+		enemy.ThornsDamage = ENEMY_THORNS_DAMAGE;
+
+		// CHECKS THE PLAYER TAKES THORNS DAMAGE.
+		// Positions the player on the enemy, waits a frame and checks for damage.
+		player.transform.position = enemy.transform.position;
+		yield return new WaitForSeconds(0.05f);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, player.Health);
+
+		// Waits for the damage grace period to expire and check for additional damage.
+		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD + 0.05f);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE * 2.0f, player.Health);
+	}
 }
