@@ -94,6 +94,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c04ef8e91389449e2f31cd53bc900, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _health: 5
+  _damageGracePeriod: 0.8
+  _gracePeriodFlashes: 4
+  _damageWhitelistTags: []
+  AttackDamage: 1
+  AttackRadius: 0.5
+  _attackCooldown: 0.5
+  ThornsDamage: 0
+  FreezeOnAttack: 0
   _tilebasedMovement: 0
   MaxSpeed: 5
   _diagonalMovementAllowed: 1
@@ -101,7 +110,7 @@ MonoBehaviour:
   _timeToMaxSpeed: 0
   _timeToFullStop: 0
   TileSize: 1
-  SecondsPerTile: 0.5
+  SecondsPerTile: 0.25
 --- !u!114 &3401940656814232552
 MonoBehaviour:
   m_ObjectHideFlags: 0

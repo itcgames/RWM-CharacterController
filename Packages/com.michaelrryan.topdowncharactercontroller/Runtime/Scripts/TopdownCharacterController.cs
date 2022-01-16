@@ -43,6 +43,7 @@ public class TopdownCharacterController : MonoBehaviour
 								  set { SetAttackCooldown(value); } }
 
 	public float ThornsDamage = 0.0f;
+	public bool FreezeOnAttack = false;
 
 	[Header("Movement")]
 	[SerializeField]
@@ -75,7 +76,7 @@ public class TopdownCharacterController : MonoBehaviour
 
 	[Header("Tilebased Movement")]
 	public float TileSize = 1.0f;
-	public float SecondsPerTile = 0.5f;
+	public float SecondsPerTile = 0.25f;
 
 
 	// ==== Private Variables ====
@@ -167,7 +168,9 @@ public class TopdownCharacterController : MonoBehaviour
 	{
 		Vector2 input = GetInput();
 
-		if (input != Vector2.zero)
+		// If there's input and not frozen on attack.
+		if (input != Vector2.zero 
+			&& (!FreezeOnAttack || CanAttack()))
 		{
 			_direction = input.normalized;
 
@@ -209,14 +212,18 @@ public class TopdownCharacterController : MonoBehaviour
 		// If the characer is not moving.
 		if (_secondsSinceMovementStarted == null)
 		{
-			Vector2 input = GetInput();
-
-			if (input != Vector2.zero)
+			// If freeze on attack is enabled, check the attack cooldown has expired.
+			if (!FreezeOnAttack || CanAttack())
 			{
-				_previousPosition = transform.position;
-				_destination = transform.position + (Vector3)input * TileSize;
-				_secondsSinceMovementStarted = currentTime;
-				_direction = input.normalized;
+				Vector2 input = GetInput();
+
+				if (input != Vector2.zero)
+				{
+					_previousPosition = transform.position;
+					_destination = transform.position + (Vector3)input * TileSize;
+					_secondsSinceMovementStarted = currentTime;
+					_direction = input.normalized;
+				}
 			}
 		}
 
@@ -334,7 +341,7 @@ public class TopdownCharacterController : MonoBehaviour
 	public void Attack()
 	{
 		// Checks the attack cooldown has expired before attacking.
-		if (Time.time >= _lastAttackTime + _attackCooldown)
+		if (CanAttack())
 		{
 			_lastAttackTime = Time.time;
 
@@ -348,7 +355,15 @@ public class TopdownCharacterController : MonoBehaviour
 				var character = collider.GetComponent<TopdownCharacterController>();
 				if (character) character.TakeDamage(AttackDamage, tag);
 			}
+
+			if (FreezeOnAttack)
+				_rb.velocity = Vector2.zero;
 		}
+	}
+
+	public bool CanAttack()
+	{
+		return Time.time >= _lastAttackTime + _attackCooldown;
 	}
 
 	public void TakeDamage(float damage, string attackersTag = null)
