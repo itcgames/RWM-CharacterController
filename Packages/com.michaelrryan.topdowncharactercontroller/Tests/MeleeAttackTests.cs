@@ -132,4 +132,29 @@ public class MeleeAttackTests
 		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD + 0.05f);
 		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE * 2.0f, player.Health);
 	}
+
+	[UnityTest]
+	public IEnumerator CharacterFreezesOnAttack()
+    {
+		// Gets and sets up the character.
+		const float ATTACK_COOLDOWN = 0.25f;
+
+		var player = TestUtilities.GetDefaultCharacter();
+		player.FreezeOnAttack = true;
+		player.AttackCooldown = ATTACK_COOLDOWN;
+
+		// Gets the player's position, attacks, and moves down.
+		Vector3 position = player.transform.position;
+		player.Attack();
+		player.MoveDown(true);
+
+		// Waits 0.1 seconds and checks the position is still the same.
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(position, player.transform.position);
+
+		// Waits the length of the attack cooldown and checks the postion has
+		//		now changed.
+		yield return new WaitForSeconds(ATTACK_COOLDOWN);
+		Assert.AreNotEqual(position, player.transform.position);
+	}
 }
