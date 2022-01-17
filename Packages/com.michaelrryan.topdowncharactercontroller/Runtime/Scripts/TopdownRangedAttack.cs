@@ -19,7 +19,8 @@ public class TopdownRangedAttack : MonoBehaviour
         if (Time.time >= _lastAttackTime + _cooldown)
         {
             _lastAttackTime = Time.time;
-            Quaternion rotation = Quaternion.LookRotation(direction, Vector3.back);
+            Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, 0.0f, 
+                Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg));
             return Instantiate(projectilePrefab, transform.position, rotation);
         }
 
