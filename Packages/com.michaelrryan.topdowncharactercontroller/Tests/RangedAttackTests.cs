@@ -91,7 +91,7 @@ public class RangedAttackTests
 		Assert.NotNull(rangedAttack);
 
 		// Positions the player to the left of the enemy.
-		player.transform.position = 
+		player.transform.position =
 			enemy.transform.position + Vector3.left * PROJECTILE_DISTANCE;
 
 		// Gets the projectile component from the fired projectile.
@@ -100,11 +100,47 @@ public class RangedAttackTests
 
 		// Gets the enemies health and waits for the bullet to hit.
 		float enemyHealth = enemy.Health;
-		yield return new WaitForSeconds((PROJECTILE_DISTANCE / projectile.Speed) 
+		yield return new WaitForSeconds((PROJECTILE_DISTANCE / projectile.Speed)
 			+ SAFETY_MARGIN);
 
 		// Checks that the enemy took damage and the projectile no longer exists.
 		Assert.AreEqual(enemyHealth - projectile.Damage, enemy.Health);
 		Assert.IsNull(GameObject.Find(PROJECTILE_NAME));
+	}
+
+	[UnityTest]
+	public IEnumerator LimitedAmmoWorksAsExpected()
+	{
+		const int AMMO = 3;
+		const float COOLDOWN = 0.1f;
+
+		// Gets the player character.
+		TopdownCharacterController player =
+			TestUtilities.GetDefaultCharacter();
+
+		// Gets the ranged attack component and checks it's not null.
+		TopdownRangedAttack rangedAttack =
+			player.GetComponent<TopdownRangedAttack>();
+		Assert.NotNull(rangedAttack);
+
+		// Setup the player's ranged attack component.
+		rangedAttack.LimitedAmmo = true;
+		rangedAttack.Ammo = AMMO;
+		rangedAttack.Cooldown = COOLDOWN;
+
+		// Loops for each ammo and fires.
+		for (int i = 0; i < AMMO; ++i)
+		{
+			// Fires a projectile, checks the bullet is not null and waits for
+			//		the cooldown to expire.
+			GameObject fired = rangedAttack.Fire(Vector2.right);
+			Assert.NotNull(fired);
+			yield return new WaitForSeconds(COOLDOWN + SAFETY_MARGIN);
+		}
+
+		// Checks the ammo is now 0 and Fire() doesn't fire a bullet.
+		Assert.AreEqual(0, rangedAttack.Ammo);
+		GameObject failed = rangedAttack.Fire(Vector2.right);
+		Assert.Null(failed);
 	}
 }
