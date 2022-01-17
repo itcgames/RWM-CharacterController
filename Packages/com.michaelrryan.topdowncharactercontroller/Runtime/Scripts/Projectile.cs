@@ -6,7 +6,8 @@ public class Projectile : MonoBehaviour
 {
 	public float Speed = 12.0f;
 	public float Damage = 1.0f;
-	public string ShootersTag = "";
+	public float ExpireTime = 5.0f; // The time before the bullet destroys itself.
+	public string ShootersTag = ""; // The tag of the shooter.
 
 	private void Start()
 	{
@@ -20,6 +21,16 @@ public class Projectile : MonoBehaviour
 			Vector3 direction = transform.rotation * Vector3.right;
 			rigidbody.velocity = direction * Speed;
 		}
+
+		StartCoroutine(DestroyAfterDelay());
+	}
+
+	private IEnumerator DestroyAfterDelay()
+	{
+		// Waits for the expire time to elapse before destroying the game object.
+		yield return new WaitForSeconds(ExpireTime);
+		if (gameObject)
+			Destroy(gameObject);
 	}
 
 	private void OnCollisionEnter2D(Collision2D collision)

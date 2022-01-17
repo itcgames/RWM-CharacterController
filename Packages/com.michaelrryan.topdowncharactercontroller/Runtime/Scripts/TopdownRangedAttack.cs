@@ -11,14 +11,22 @@ public class TopdownRangedAttack : MonoBehaviour
 	public float Cooldown { get { return _cooldown; }
 							set { SetCooldown(value); } }
 
+	public bool LimitedAmmo = false;
+	public int Ammo = 0;
+
 	private float _lastAttackTime;
 
 	public GameObject Fire(Vector2 direction)
 	{
 		// Ensures the cooldown has expired before firing.
-		if (Time.time >= _lastAttackTime + _cooldown)
+		if (Time.time >= _lastAttackTime + _cooldown
+			&& (!LimitedAmmo || Ammo > 0))
 		{
+			// Updates the last attack time.
 			_lastAttackTime = Time.time;
+
+			// Decreases ammo if limited ammo is enabled.
+			if (LimitedAmmo) Ammo--;
 
 			// Gets the direction as a quaternion.
 			Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, 0.0f, 
