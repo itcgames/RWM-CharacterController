@@ -160,6 +160,24 @@ public class HealthTests
 	}
 
 	[UnityTest]
+	public IEnumerator AllWhitelistTagAllowsAnyTag()
+    {
+		// Gets the character and whitelists the "All" tag.
+		var character = TestUtilities.GetDefaultCharacter();
+		character.DamageWhitelistTags.Add("All");
+
+		// Takes a copy for later.
+		float health = character.Health;
+
+		// Damages the character, passing a non whitelisted tag.
+		character.TakeDamage(character.Health / 2.0f, "Enemy");
+
+		// Checks the character's health has gone down the next frame.
+		yield return null;
+		Assert.Less(character.Health, health);
+	}
+
+	[UnityTest]
 	public IEnumerator DeathCallbacksAreRunOnDeath()
 	{
 		// Gets the character adds the callback and initialises the checker variable.
