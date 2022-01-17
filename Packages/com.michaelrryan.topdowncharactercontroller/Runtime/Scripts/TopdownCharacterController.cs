@@ -32,6 +32,19 @@ public class TopdownCharacterController : MonoBehaviour
 	public delegate void DeathCallback();
 	public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
 
+	[Header("Combat")]
+
+	public float AttackDamage = 1.0f;
+	public float AttackRadius = 0.5f;
+
+	[SerializeField]
+	private float _attackCooldown = 0.5f;
+	public float AttackCooldown { get { return _attackCooldown; }
+								  set { SetAttackCooldown(value); } }
+
+	public float ThornsDamage = 0.0f;
+	public bool FreezeOnAttack = false;
+
 	[Header("Movement")]
 	[SerializeField]
 	private bool _tilebasedMovement = false;
@@ -63,7 +76,7 @@ public class TopdownCharacterController : MonoBehaviour
 
 	[Header("Tilebased Movement")]
 	public float TileSize = 1.0f;
-	public float SecondsPerTile = 0.5f;
+	public float SecondsPerTile = 0.25f;
 
 
 	// ==== Private Variables ====
@@ -72,9 +85,11 @@ public class TopdownCharacterController : MonoBehaviour
 	private Renderer _renderer;
 	private Vector2 _frameInput = Vector2.zero;
 	private Vector2 _persistentInput = Vector2.zero;
+	private Vector2 _direction = Vector2.down;
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
 	private float _lastHitTaken = 0.0f;
+	private float _lastAttackTime = 0.0f;
 
 	// Used internally for both regular and tilebased movement, similar to
 	//      _diagonalMovementAllowed but can change without a users intention.
@@ -110,12 +125,17 @@ public class TopdownCharacterController : MonoBehaviour
 			_rb = GetComponent<Rigidbody2D>();
 		}
 
+		_rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
+
 		// Ensures the rigidbody is set up correctly.
 		_rb.isKinematic = true;
 		_rb.useFullKinematicContacts = true;
 
 		// Sets the last hit taken time so the character can immediately start taking damage.
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
+
+		// Sets the last attack time so the character can immediately start attacking.
+		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
 	}
 
 	private void Update()
@@ -128,6 +148,19 @@ public class TopdownCharacterController : MonoBehaviour
 		_frameInput = Vector2.zero;
 	}
 
+	private void OnCollisionStay2D(Collision2D collision)
+	{
+		if (ThornsDamage != 0.0f)
+		{
+			var character = 
+				collision.collider.GetComponent<TopdownCharacterController>();
+
+			// If a character component was retrieved, damage it.
+			if (character)
+				character.TakeDamage(ThornsDamage, tag);
+		}
+	}
+
 
 	// ==== Custom Methods ====
 
@@ -135,12 +168,16 @@ public class TopdownCharacterController : MonoBehaviour
 	{
 		Vector2 input = GetInput();
 
-		if (input != Vector2.zero)
+		// If there's input and not frozen on attack.
+		if (input != Vector2.zero 
+			&& (!FreezeOnAttack || CanAttack()))
 		{
+			_direction = input.normalized;
+
 			if (_timeToMaxSpeed != 0.0f)
 			{
 				// Accelerates towards the input direction.
-				_rb.velocity += input.normalized * _acceleration * Time.deltaTime;
+				_rb.velocity += _direction * _acceleration * Time.deltaTime;
 
 				// Checks if the character's speed is greater than the max (using
 				//      squares for performance)
@@ -150,7 +187,7 @@ public class TopdownCharacterController : MonoBehaviour
 			else
 			{
 				// Moves at a constant speed toward to input direction.
-				_rb.velocity = input.normalized * MaxSpeed;
+				_rb.velocity = _direction * MaxSpeed;
 			}
 		}
 		else
@@ -175,13 +212,18 @@ public class TopdownCharacterController : MonoBehaviour
 		// If the characer is not moving.
 		if (_secondsSinceMovementStarted == null)
 		{
-			Vector2 input = GetInput();
-
-			if (input != Vector2.zero)
+			// If freeze on attack is enabled, check the attack cooldown has expired.
+			if (!FreezeOnAttack || CanAttack())
 			{
-				_previousPosition = transform.position;
-				_destination = transform.position + (Vector3)GetInput() * TileSize;
-				_secondsSinceMovementStarted = currentTime;
+				Vector2 input = GetInput();
+
+				if (input != Vector2.zero)
+				{
+					_previousPosition = transform.position;
+					_destination = transform.position + (Vector3)input * TileSize;
+					_secondsSinceMovementStarted = currentTime;
+					_direction = input.normalized;
+				}
 			}
 		}
 
@@ -247,6 +289,12 @@ public class TopdownCharacterController : MonoBehaviour
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
 	}
 
+	private void SetAttackCooldown(float value)
+	{
+		_attackCooldown = value;
+		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
+	}
+
 	private void SetTilebasedMovement(bool value)
 	{
 		_tilebasedMovement = value;
@@ -289,6 +337,34 @@ public class TopdownCharacterController : MonoBehaviour
 	}
 
 	// ==== Public Methods ====
+
+	public void Attack()
+	{
+		// Checks the attack cooldown has expired before attacking.
+		if (CanAttack())
+		{
+			_lastAttackTime = Time.time;
+
+			// Finds all colliders within a radius in front of the character.
+			Vector2 attackPosition = (Vector2)transform.position + _direction * AttackRadius;
+			Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
+
+			// Check through colliders and damages any character controllers.
+			foreach (Collider2D collider in colliders)
+			{
+				var character = collider.GetComponent<TopdownCharacterController>();
+				if (character) character.TakeDamage(AttackDamage, tag);
+			}
+
+			if (FreezeOnAttack)
+				_rb.velocity = Vector2.zero;
+		}
+	}
+
+	public bool CanAttack()
+	{
+		return Time.time >= _lastAttackTime + _attackCooldown;
+	}
 
 	public void TakeDamage(float damage, string attackersTag = null)
 	{
