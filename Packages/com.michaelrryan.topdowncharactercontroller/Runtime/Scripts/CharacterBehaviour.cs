@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class CharacterBehaviour : MonoBehaviour
 {
     public TopdownCharacterController Controller { get; private set; }
+    public TopdownRangedAttack RangedAttack { get; private set; }
 
     public void Start()
     {
@@ -14,5 +15,7 @@ public abstract class CharacterBehaviour : MonoBehaviour
         // Disables this behaviour if no controller found.
         if (!Controller)
             enabled = false;
+        else
+            RangedAttack = GetComponent<TopdownRangedAttack>();
     }
 }

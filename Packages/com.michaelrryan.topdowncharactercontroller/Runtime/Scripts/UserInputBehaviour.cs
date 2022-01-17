@@ -23,6 +23,11 @@ public class UserInputBehaviour : CharacterBehaviour
                 Controller.PreferHorizontal = false;
         }
 
-        if (Input.GetKey(KeyCode.C)) Controller.Attack();
+        if (Input.GetKey(KeyCode.C))
+            Controller.Attack();
+
+        if (RangedAttack && Input.GetKeyDown(KeyCode.X))
+            RangedAttack.Fire(Controller.Direction);
+
     }
 }
