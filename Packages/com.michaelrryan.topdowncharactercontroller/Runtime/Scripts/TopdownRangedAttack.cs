@@ -15,8 +15,15 @@ public class TopdownRangedAttack : MonoBehaviour
 
     public GameObject Fire(Vector2 direction)
     {
-        Quaternion rotation = Quaternion.LookRotation(direction, Vector3.back);
-        return Instantiate(projectilePrefab, transform.position, rotation);
+        // Ensures the cooldown has expired before firing.
+        if (Time.time >= _lastAttackTime + _cooldown)
+        {
+            _lastAttackTime = Time.time;
+            Quaternion rotation = Quaternion.LookRotation(direction, Vector3.back);
+            return Instantiate(projectilePrefab, transform.position, rotation);
+        }
+
+        return null;
     }
 
     private void Start()
