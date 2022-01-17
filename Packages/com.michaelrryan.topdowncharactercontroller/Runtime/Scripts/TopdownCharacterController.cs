@@ -83,6 +83,8 @@ public class TopdownCharacterController : MonoBehaviour
 
 	// ==== Private Variables ====
 
+	private const string ALL_TAG = "All";
+
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
 	private Vector2 _frameInput = Vector2.zero;
@@ -367,13 +369,16 @@ public class TopdownCharacterController : MonoBehaviour
 		return Time.time >= _lastAttackTime + _attackCooldown;
 	}
 
-	public void TakeDamage(float damage, string attackersTag = null)
+	public bool TakeDamage(float damage, string attackersTag = null)
 	{
 		// Checks the grace period has elapsed.
 		if (Time.time >= _lastHitTaken + _damageGracePeriod)
 		{
-			// Checks if the attackers tag is whitelisted to damage this object.
-			if (attackersTag == null || _damageWhitelistTags.Contains(attackersTag))
+			// Checks if the attackers tag is whitelisted to damage this object,
+			//		or if the whitelist contains "All".
+			if (attackersTag == null 
+				|| _damageWhitelistTags.Contains(attackersTag)
+				|| _damageWhitelistTags.Contains(ALL_TAG))
 			{
 				// Sets the new last hit taken time and takes the damage.
 				_lastHitTaken = Time.time;
@@ -387,8 +392,12 @@ public class TopdownCharacterController : MonoBehaviour
 				}
 				// Starts the flash coroutine if not dead.
 				else StartCoroutine(FlashForGracePeriod());
+
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	public void MoveRight(bool persistent = false)

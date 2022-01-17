@@ -4,46 +4,57 @@ using UnityEngine;
 
 public class TopdownRangedAttack : MonoBehaviour
 {
-    public GameObject projectilePrefab;
+	public GameObject projectilePrefab;
 
-    [SerializeField]
-    private float _cooldown = 0.5f;
-    public float Cooldown { get { return _cooldown; }
-                            set { SetCooldown(value); } }
+	[SerializeField]
+	private float _cooldown = 0.5f;
+	public float Cooldown { get { return _cooldown; }
+							set { SetCooldown(value); } }
 
-    private float _lastAttackTime;
+	private float _lastAttackTime;
 
-    public GameObject Fire(Vector2 direction)
-    {
-        // Ensures the cooldown has expired before firing.
-        if (Time.time >= _lastAttackTime + _cooldown)
-        {
-            _lastAttackTime = Time.time;
-            Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, 0.0f, 
-                Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg));
-            return Instantiate(projectilePrefab, transform.position, rotation);
-        }
+	public GameObject Fire(Vector2 direction)
+	{
+		// Ensures the cooldown has expired before firing.
+		if (Time.time >= _lastAttackTime + _cooldown)
+		{
+			_lastAttackTime = Time.time;
 
-        return null;
-    }
+			// Gets the direction as a quaternion.
+			Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, 0.0f, 
+				Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg));
 
-    private void Start()
-    {
-        // Ensures no cooldown needs to be waited on when the scene begins.
-        SetCooldown(_cooldown);
-    }
+			// Instantiates the projectile.
+			GameObject projectileObj =
+				Instantiate(projectilePrefab, transform.position, rotation);
 
-    private void OnValidate()
-    {
-        // Ensures the properties' set functions are called when one changes.
-        Cooldown = _cooldown;
-    }
+			// Gets the projectile component and assigns the shooters tag.
+			Projectile projectile = projectileObj.GetComponent<Projectile>();
+			projectile.ShootersTag = tag;
 
-    private void SetCooldown(float value)
-    {
-        _cooldown = value;
+			return projectileObj;
+		}
 
-        // Sets the last attack time so no cooldown needs to be waited on.
-        _lastAttackTime = Time.time - _cooldown * 2.0f;
-    }
+		return null;
+	}
+
+	private void Start()
+	{
+		// Ensures no cooldown needs to be waited on when the scene begins.
+		SetCooldown(_cooldown);
+	}
+
+	private void OnValidate()
+	{
+		// Ensures the properties' set functions are called when one changes.
+		Cooldown = _cooldown;
+	}
+
+	private void SetCooldown(float value)
+	{
+		_cooldown = value;
+
+		// Sets the last attack time so no cooldown needs to be waited on.
+		_lastAttackTime = Time.time - _cooldown * 2.0f;
+	}
 }

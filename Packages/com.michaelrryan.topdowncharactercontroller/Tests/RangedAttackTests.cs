@@ -27,17 +27,19 @@ public class RangedAttackTests
 			player.GetComponent<TopdownRangedAttack>();
 		Assert.NotNull(rangedAttack);
 
-		// Fires a projectile and waits a frame.
+		// Fires a projectile.
 		GameObject fired = rangedAttack.Fire(player.Direction);
+
+		// Ensures the projectile and player share the same position.
+		Assert.AreEqual(player.transform.position, fired.transform.position);
+
+		// Waits a frame.
 		yield return null;
 
 		// Ensures the projectile exists and matches the projectile returned.
 		GameObject projectile = GameObject.Find(PROJECTILE_NAME);
 		Assert.NotNull(projectile);
 		Assert.AreSame(fired, projectile);
-
-		// Ensures the projectile and player share the same position.
-		Assert.AreEqual(player.transform.position, projectile.transform.position);
 	}
 
 	[UnityTest]
