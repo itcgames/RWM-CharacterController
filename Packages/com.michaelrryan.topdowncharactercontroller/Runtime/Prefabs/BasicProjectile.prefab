@@ -84,6 +84,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 12
+  Damage: 1
+  ExpireTime: 5
+  ShootersTag: 
 --- !u!1 &8831567353388963165
 GameObject:
   m_ObjectHideFlags: 0

@@ -107,8 +107,9 @@ public class RangedAttackTests
 		Assert.NotNull(projectileObj);
 		Projectile projectile = projectileObj.GetComponent<Projectile>();
 		Assert.NotNull(projectile);
-		
+
 		// Sets the projectile expire time.
+		float expireTime = projectile.ExpireTime;
 		projectile.ExpireTime = PROJECTILE_EXPIRE_TIME;
 
 		// Fires a projectile and ensures it's not null.
@@ -121,6 +122,9 @@ public class RangedAttackTests
 		fired = GameObject.Find(PROJECTILE_NAME);
 		Assert.Null(fired);
 
+		// Sets the expire time back to what it was as Unity does not do this
+		//		automatically.
+		projectile.ExpireTime = expireTime;
 	}
 
 	[UnityTest]
