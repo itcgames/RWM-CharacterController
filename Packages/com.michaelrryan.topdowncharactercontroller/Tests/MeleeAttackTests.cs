@@ -123,9 +123,9 @@ public class MeleeAttackTests
 		enemy.ThornsDamage = ENEMY_THORNS_DAMAGE;
 
 		// CHECKS THE PLAYER TAKES THORNS DAMAGE.
-		// Positions the player on the enemy, waits a frame and checks for damage.
+		// Positions the player on the enemy, waits half the damage grace period..
 		player.transform.position = enemy.transform.position;
-		yield return new WaitForSeconds(0.05f);
+		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD * 0.5f);
 		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, player.Health);
 
 		// Waits for the damage grace period to expire and check for additional damage.

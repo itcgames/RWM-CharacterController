@@ -51,6 +51,8 @@ public class TopdownCharacterController : MonoBehaviour
 	public bool TilebasedMovement { get { return _tilebasedMovement; } 
 									set { SetTilebasedMovement(value); } }
 
+	public Vector2 Direction = Vector2.down;
+
 	[Header("Regular Movement")]
 	public float MaxSpeed = 5.0f;
 
@@ -81,11 +83,12 @@ public class TopdownCharacterController : MonoBehaviour
 
 	// ==== Private Variables ====
 
+	private const string ALL_TAG = "All";
+
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
 	private Vector2 _frameInput = Vector2.zero;
 	private Vector2 _persistentInput = Vector2.zero;
-	private Vector2 _direction = Vector2.down;
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
 	private float _lastHitTaken = 0.0f;
@@ -172,12 +175,12 @@ public class TopdownCharacterController : MonoBehaviour
 		if (input != Vector2.zero 
 			&& (!FreezeOnAttack || CanAttack()))
 		{
-			_direction = input.normalized;
+			Direction = input.normalized;
 
 			if (_timeToMaxSpeed != 0.0f)
 			{
 				// Accelerates towards the input direction.
-				_rb.velocity += _direction * _acceleration * Time.deltaTime;
+				_rb.velocity += Direction * _acceleration * Time.deltaTime;
 
 				// Checks if the character's speed is greater than the max (using
 				//      squares for performance)
@@ -187,7 +190,7 @@ public class TopdownCharacterController : MonoBehaviour
 			else
 			{
 				// Moves at a constant speed toward to input direction.
-				_rb.velocity = _direction * MaxSpeed;
+				_rb.velocity = Direction * MaxSpeed;
 			}
 		}
 		else
@@ -222,7 +225,7 @@ public class TopdownCharacterController : MonoBehaviour
 					_previousPosition = transform.position;
 					_destination = transform.position + (Vector3)input * TileSize;
 					_secondsSinceMovementStarted = currentTime;
-					_direction = input.normalized;
+					Direction = input.normalized;
 				}
 			}
 		}
@@ -346,7 +349,7 @@ public class TopdownCharacterController : MonoBehaviour
 			_lastAttackTime = Time.time;
 
 			// Finds all colliders within a radius in front of the character.
-			Vector2 attackPosition = (Vector2)transform.position + _direction * AttackRadius;
+			Vector2 attackPosition = (Vector2)transform.position + Direction * AttackRadius;
 			Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
 
 			// Check through colliders and damages any character controllers.
@@ -366,13 +369,16 @@ public class TopdownCharacterController : MonoBehaviour
 		return Time.time >= _lastAttackTime + _attackCooldown;
 	}
 
-	public void TakeDamage(float damage, string attackersTag = null)
+	public bool TakeDamage(float damage, string attackersTag = null)
 	{
 		// Checks the grace period has elapsed.
 		if (Time.time >= _lastHitTaken + _damageGracePeriod)
 		{
-			// Checks if the attackers tag is whitelisted to damage this object.
-			if (attackersTag == null || _damageWhitelistTags.Contains(attackersTag))
+			// Checks if the attackers tag is whitelisted to damage this object,
+			//		or if the whitelist contains "All".
+			if (attackersTag == null 
+				|| _damageWhitelistTags.Contains(attackersTag)
+				|| _damageWhitelistTags.Contains(ALL_TAG))
 			{
 				// Sets the new last hit taken time and takes the damage.
 				_lastHitTaken = Time.time;
@@ -386,8 +392,12 @@ public class TopdownCharacterController : MonoBehaviour
 				}
 				// Starts the flash coroutine if not dead.
 				else StartCoroutine(FlashForGracePeriod());
+
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	public void MoveRight(bool persistent = false)

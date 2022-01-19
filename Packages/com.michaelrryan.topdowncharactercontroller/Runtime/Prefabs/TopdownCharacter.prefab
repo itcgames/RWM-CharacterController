@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1590756327094295974}
   - component: {fileID: 1590756327094295975}
   - component: {fileID: 1590756327094295972}
+  - component: {fileID: 5718288718091086199}
   - component: {fileID: 3401940656814232552}
   - component: {fileID: 8370774134762580273}
   m_Layer: 0
@@ -104,6 +105,7 @@ MonoBehaviour:
   ThornsDamage: 0
   FreezeOnAttack: 0
   _tilebasedMovement: 0
+  Direction: {x: 0, y: -1}
   MaxSpeed: 5
   _diagonalMovementAllowed: 1
   _preferHorizontal: 0
@@ -111,6 +113,20 @@ MonoBehaviour:
   _timeToFullStop: 0
   TileSize: 1
   SecondsPerTile: 0.25
+--- !u!114 &5718288718091086199
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590756327094295973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 978266e151c522640ba53d4e287c3550, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefab: {fileID: 4993804359816569444, guid: 864be05f3dfa0e34792654ea8e49db08,
+    type: 3}
 --- !u!114 &3401940656814232552
 MonoBehaviour:
   m_ObjectHideFlags: 0
