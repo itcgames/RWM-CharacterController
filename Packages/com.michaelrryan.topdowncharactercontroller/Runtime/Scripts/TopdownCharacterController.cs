@@ -80,10 +80,17 @@ public class TopdownCharacterController : MonoBehaviour
 	public float TileSize = 1.0f;
 	public float SecondsPerTile = 0.25f;
 
+	[Header("Animation")]
+	public bool HandleAnimationEvents = true;
+	public Animator Animator;
 
 	// ==== Private Variables ====
 
 	private const string ALL_TAG = "All";
+	private const string FACE_LEFT = "FaceLeft";
+	private const string FACE_RIGHT = "FaceRight";
+	private const string FACE_UP = "FaceUp";
+	private const string FACE_DOWN = "FaceDown";
 
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
@@ -118,6 +125,7 @@ public class TopdownCharacterController : MonoBehaviour
 
 	private void Start()
 	{
+		Animator = GetComponent<Animator>();
 		_renderer = GetComponent<Renderer>();
 		_rb = GetComponent<Rigidbody2D>();
 
@@ -406,6 +414,8 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.x = Mathf.Min(_persistentInput.x + 1.0f, 1.0f);
 		else
 			_frameInput.x = Mathf.Min(_frameInput.x + 1.0f, 1.0f);
+
+		if (Animator) Animator.SetTrigger(FACE_RIGHT);
 	}
 
 	public void MoveLeft(bool persistent = false)
@@ -414,6 +424,8 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.x = Mathf.Max(_persistentInput.x - 1.0f, -1.0f);
 		else
 			_frameInput.x = Mathf.Max(_frameInput.x - 1.0f, -1.0f);
+
+		if (Animator) Animator.SetTrigger(FACE_LEFT);
 	}
 
 	public void MoveUp(bool persistent = false)
@@ -422,6 +434,8 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.y = Mathf.Min(_persistentInput.y + 1.0f, 1.0f);
 		else
 			_frameInput.y = Mathf.Min(_frameInput.y + 1.0f, 1.0f);
+
+		if (Animator) Animator.SetTrigger(FACE_UP);
 	}
 
 	public void MoveDown(bool persistent = false)
@@ -430,6 +444,8 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.y = Mathf.Max(_persistentInput.y - 1.0f, -1.0f);
 		else
 			_frameInput.y = Mathf.Max(_frameInput.y - 1.0f, -1.0f);
+
+		if (Animator) Animator.SetTrigger(FACE_DOWN);
 	}
 
 	public void ClearPersistentInput()
