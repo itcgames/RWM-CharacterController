@@ -91,6 +91,8 @@ public class TopdownCharacterController : MonoBehaviour
 	private const string FACE_RIGHT = "FaceRight";
 	private const string FACE_UP = "FaceUp";
 	private const string FACE_DOWN = "FaceDown";
+	private const string HORIZONTAL_VELOCITY = "HorizontalVelocity";
+	private const string VERTICAL_VELOCITY = "VerticalVelocity";
 
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
@@ -214,6 +216,12 @@ public class TopdownCharacterController : MonoBehaviour
 				_rb.velocity = Vector2.zero;
 			}
 		}
+
+		if (Animator && HandleAnimationEvents)
+		{
+			Animator.SetFloat(HORIZONTAL_VELOCITY, _rb.velocity.x);
+			Animator.SetFloat(VERTICAL_VELOCITY, _rb.velocity.y);
+		}
 	}
 
 	private void UpdateTilebasedMovement()
@@ -234,6 +242,12 @@ public class TopdownCharacterController : MonoBehaviour
 					_destination = transform.position + (Vector3)input * TileSize;
 					_secondsSinceMovementStarted = currentTime;
 					Direction = input.normalized;
+
+					if (Animator && HandleAnimationEvents)
+					{
+						Animator.SetFloat(HORIZONTAL_VELOCITY, 1.0f);
+						Animator.SetFloat(VERTICAL_VELOCITY, 1.0f);
+					}
 				}
 			}
 		}
@@ -251,6 +265,12 @@ public class TopdownCharacterController : MonoBehaviour
 		{
 			transform.position = _destination;
 			_secondsSinceMovementStarted = null;
+
+			if (Animator && HandleAnimationEvents)
+			{
+				Animator.SetFloat(HORIZONTAL_VELOCITY, 0.0f);
+				Animator.SetFloat(VERTICAL_VELOCITY, 0.0f);
+			}
 		}
 	}
 
@@ -414,8 +434,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.x = Mathf.Min(_persistentInput.x + 1.0f, 1.0f);
 		else
 			_frameInput.x = Mathf.Min(_frameInput.x + 1.0f, 1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_RIGHT);
 	}
 
 	public void MoveLeft(bool persistent = false)
@@ -424,8 +442,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.x = Mathf.Max(_persistentInput.x - 1.0f, -1.0f);
 		else
 			_frameInput.x = Mathf.Max(_frameInput.x - 1.0f, -1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_LEFT);
 	}
 
 	public void MoveUp(bool persistent = false)
@@ -434,8 +450,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.y = Mathf.Min(_persistentInput.y + 1.0f, 1.0f);
 		else
 			_frameInput.y = Mathf.Min(_frameInput.y + 1.0f, 1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_UP);
 	}
 
 	public void MoveDown(bool persistent = false)
@@ -444,8 +458,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.y = Mathf.Max(_persistentInput.y - 1.0f, -1.0f);
 		else
 			_frameInput.y = Mathf.Max(_frameInput.y - 1.0f, -1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_DOWN);
 	}
 
 	public void ClearPersistentInput()
