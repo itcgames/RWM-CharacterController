@@ -13,6 +13,11 @@ public class AnimationTests
 	private const string IDLE_UP = "IdleUp";
 	private const string IDLE_DOWN = "IdleDown";
 
+	private const string MOVING_LEFT = "MovingLeft";
+	private const string MOVING_RIGHT = "MovingRight";
+	private const string MOVING_UP = "MovingUp";
+	private const string MOVING_DOWN = "MovingDown";
+
 	private const string DEFAULT_ANIMATION = IDLE_DOWN;
 
 	[SetUp]
@@ -27,9 +32,7 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 
 		// Checks the default animation is correct.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(DEFAULT_ANIMATION, info[0].clip.name);
+		Assert.AreEqual(DEFAULT_ANIMATION, GetCurrentClipName(player.Animator));
 
 		yield return null;
 	}
@@ -41,11 +44,7 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.MoveLeft();
 		yield return new WaitForSeconds(0.1f);
-
-		// Checks the animation is the left facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_LEFT, info[0].clip.name);
+		Assert.AreEqual(IDLE_LEFT, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -55,11 +54,7 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.MoveRight();
 		yield return new WaitForSeconds(0.1f);
-
-		// Checks the animation is the right facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_RIGHT, info[0].clip.name);
+		Assert.AreEqual(IDLE_RIGHT, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -69,11 +64,7 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.MoveUp();
 		yield return new WaitForSeconds(0.1f);
-
-		// Checks the animation is the upward facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_UP, info[0].clip.name);
+		Assert.AreEqual(IDLE_UP, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -91,11 +82,7 @@ public class AnimationTests
 		// Moves the player down and waits.
 		player.MoveDown();
 		yield return new WaitForSeconds(0.1f);
-
-		// Checks the animation is the downward facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_DOWN, info[0].clip.name);
+		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -105,13 +92,10 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.TilebasedMovement = true;
 		player.SecondsPerTile = 0.1f;
+
 		player.MoveLeft();
 		yield return new WaitForSeconds(0.2f);
-
-		// Checks the animation is the left facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_LEFT, info[0].clip.name);
+		Assert.AreEqual(IDLE_LEFT, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -121,13 +105,10 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.TilebasedMovement = true;
 		player.SecondsPerTile = 0.1f;
+
 		player.MoveRight();
 		yield return new WaitForSeconds(0.2f);
-
-		// Checks the animation is the right facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_RIGHT, info[0].clip.name);
+		Assert.AreEqual(IDLE_RIGHT, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -137,13 +118,10 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.TilebasedMovement = true;
 		player.SecondsPerTile = 0.1f;
+
 		player.MoveUp();
 		yield return new WaitForSeconds(0.2f);
-
-		// Checks the animation is the upward facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_UP, info[0].clip.name);
+		Assert.AreEqual(IDLE_UP, GetCurrentClipName(player.Animator));
 	}
 
 	[UnityTest]
@@ -157,16 +135,96 @@ public class AnimationTests
 		var player = TestUtilities.GetDefaultCharacter();
 		player.TilebasedMovement = true;
 		player.SecondsPerTile = 0.1f;
+
 		player.MoveUp();
 		yield return new WaitForSeconds(0.2f);
 
 		// Moves the player down and waits.
 		player.MoveDown();
 		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
+	}
 
-		// Checks the animation is the downward facing animation.
-		var info = player.Animator.GetCurrentAnimatorClipInfo(0);
+	[UnityTest]
+	public IEnumerator CharacterMovementAnimatesLeft()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.MoveLeft(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_LEFT, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator CharacterMovementAnimatesRight()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.MoveRight(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_RIGHT, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator CharacterMovementAnimatesUp()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.MoveUp(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_UP, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator CharacterMovementAnimatesDown()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.MoveDown(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_DOWN, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator TilebasedCharacterMovementAnimatesLeft()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.TilebasedMovement = true;
+		player.MoveLeft(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_LEFT, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator TilebasedCharacterMovementAnimatesRight()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.TilebasedMovement = true;
+		player.MoveRight(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_RIGHT, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator TilebasedCharacterMovementAnimatesUp()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.TilebasedMovement = true;
+		player.MoveUp(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_UP, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator TilebasedCharacterMovementAnimatesDown()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.TilebasedMovement = true;
+		player.MoveDown(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(MOVING_DOWN, GetCurrentClipName(player.Animator));
+	}
+
+	private string GetCurrentClipName(Animator animator)
+    {
+		var info = animator.GetCurrentAnimatorClipInfo(0);
 		Assert.IsNotEmpty(info);
-		Assert.AreEqual(IDLE_DOWN, info[0].clip.name);
+		return info[0].clip.name;
 	}
 }
