@@ -407,6 +407,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
         type: 3}
+      propertyPath: _diagonalMovementAllowed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1590756327094295972, guid: 30f37926d62f56143b7c78120f5ace8a,
+        type: 3}
       propertyPath: _damageWhitelistTags.Array.size
       value: 1
       objectReference: {fileID: 0}

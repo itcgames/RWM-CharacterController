@@ -87,12 +87,9 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Private Variables ====
 
 	private const string ALL_TAG = "All";
-	private const string FACE_LEFT = "FaceLeft";
-	private const string FACE_RIGHT = "FaceRight";
-	private const string FACE_UP = "FaceUp";
-	private const string FACE_DOWN = "FaceDown";
-	private const string HORIZONTAL_VELOCITY = "HorizontalVelocity";
-	private const string VERTICAL_VELOCITY = "VerticalVelocity";
+	private const string DIRECTION_HORIZONTAL = "DirectionHorizontal";
+	private const string DIRECTION_VERTICAL = "DirectionVertical";
+	private const string SPEED = "Speed";
 
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
@@ -127,7 +124,6 @@ public class TopdownCharacterController : MonoBehaviour
 
 	private void Start()
 	{
-		Animator = GetComponent<Animator>();
 		_renderer = GetComponent<Renderer>();
 		_rb = GetComponent<Rigidbody2D>();
 
@@ -143,6 +139,16 @@ public class TopdownCharacterController : MonoBehaviour
 		// Ensures the rigidbody is set up correctly.
 		_rb.isKinematic = true;
 		_rb.useFullKinematicContacts = true;
+
+		// Gets and sets up the animator.
+		Animator = GetComponent<Animator>();
+
+		if (Animator && HandleAnimationEvents)
+		{
+			Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+			Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+			Animator.SetFloat(SPEED, 0.0f);
+		}
 
 		// Sets the last hit taken time so the character can immediately start taking damage.
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
@@ -202,6 +208,14 @@ public class TopdownCharacterController : MonoBehaviour
 				// Moves at a constant speed toward to input direction.
 				_rb.velocity = Direction * MaxSpeed;
 			}
+
+			// Sets the animation properties.
+			if (Animator && HandleAnimationEvents)
+			{
+				Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+				Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+				Animator.SetFloat(SPEED, _rb.velocity.sqrMagnitude);
+			}
 		}
 		else
 		{
@@ -215,12 +229,10 @@ public class TopdownCharacterController : MonoBehaviour
 				// Brings the character to a complete stop.
 				_rb.velocity = Vector2.zero;
 			}
-		}
 
-		if (Animator && HandleAnimationEvents)
-		{
-			Animator.SetFloat(HORIZONTAL_VELOCITY, _rb.velocity.x);
-			Animator.SetFloat(VERTICAL_VELOCITY, _rb.velocity.y);
+			// Sets the animation speed property to 0.
+			if (Animator && HandleAnimationEvents)
+				Animator.SetFloat(SPEED, 0.0f);
 		}
 	}
 
@@ -245,8 +257,9 @@ public class TopdownCharacterController : MonoBehaviour
 
 					if (Animator && HandleAnimationEvents)
 					{
-						Animator.SetFloat(HORIZONTAL_VELOCITY, 1.0f);
-						Animator.SetFloat(VERTICAL_VELOCITY, 1.0f);
+						Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+						Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+						Animator.SetFloat(SPEED, 1.0f);
 					}
 				}
 			}
@@ -267,10 +280,7 @@ public class TopdownCharacterController : MonoBehaviour
 			_secondsSinceMovementStarted = null;
 
 			if (Animator && HandleAnimationEvents)
-			{
-				Animator.SetFloat(HORIZONTAL_VELOCITY, 0.0f);
-				Animator.SetFloat(VERTICAL_VELOCITY, 0.0f);
-			}
+				Animator.SetFloat(SPEED, 0.0f);
 		}
 	}
 
