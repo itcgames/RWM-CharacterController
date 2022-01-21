@@ -262,6 +262,13 @@ public class TopdownCharacterController : MonoBehaviour
 						Animator.SetFloat(SPEED, 1.0f);
 					}
 				}
+
+				// If no input, set the animators speed property to zero.
+				// We do this here opposed to when the movement is complete to
+				//		avoid prematurely ending the animation between tiles
+				//		while a movement key is held.
+				else if (Animator && HandleAnimationEvents)
+					Animator.SetFloat(SPEED, 0.0f);
 			}
 		}
 
@@ -278,9 +285,6 @@ public class TopdownCharacterController : MonoBehaviour
 		{
 			transform.position = _destination;
 			_secondsSinceMovementStarted = null;
-
-			if (Animator && HandleAnimationEvents)
-				Animator.SetFloat(SPEED, 0.0f);
 		}
 	}
 
