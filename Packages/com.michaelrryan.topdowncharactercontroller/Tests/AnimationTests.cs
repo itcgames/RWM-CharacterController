@@ -23,7 +23,14 @@ public class AnimationTests
 	private const string ATTACK_UP = "AttackUp";
 	private const string ATTACK_DOWN = "AttackDown";
 
+	private const string ENEMY_MOVING_LEFT = "EnemyMovingLeft";
+	private const string ENEMY_MOVING_RIGHT = "EnemyMovingRight";
+	private const string ENEMY_MOVING_UP = "EnemyMovingUp";
+	private const string ENEMY_MOVING_DOWN = "EnemyMovingDown";
+
 	private const string DEFAULT_ANIMATION = IDLE_DOWN;
+
+	private const string ENEMY_CHARACTER = "Enemy";
 
 	[SetUp]
 	public void Setup()
@@ -291,6 +298,35 @@ public class AnimationTests
 		player.Attack();
 		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator CustomAnimationsFunctionCorrectly()
+	{
+		var enemy = TestUtilities.GetCharacterByName(ENEMY_CHARACTER);
+
+		// Checks left movement.
+		enemy.MoveLeft(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ENEMY_MOVING_LEFT, GetCurrentClipName(enemy.Animator));
+
+		// Checks right movement.
+		enemy.ClearPersistentInput();
+		enemy.MoveRight(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ENEMY_MOVING_RIGHT, GetCurrentClipName(enemy.Animator));
+
+		// Checks upward movement.
+		enemy.ClearPersistentInput();
+		enemy.MoveUp(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ENEMY_MOVING_UP, GetCurrentClipName(enemy.Animator));
+
+		// Checks downward movement.
+		enemy.ClearPersistentInput();
+		enemy.MoveDown(true);
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ENEMY_MOVING_DOWN, GetCurrentClipName(enemy.Animator));
 	}
 
 	private string GetCurrentClipName(Animator animator)
