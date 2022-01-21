@@ -57,7 +57,7 @@ MonoBehaviour:
   _attackCooldown: 0.5
   ThornsDamage: 0
   FreezeOnAttack: 0
-  _tilebasedMovement: 0
+  _tilebasedMovement: 1
   Direction: {x: 0, y: -1}
   MaxSpeed: 5
   _diagonalMovementAllowed: 1

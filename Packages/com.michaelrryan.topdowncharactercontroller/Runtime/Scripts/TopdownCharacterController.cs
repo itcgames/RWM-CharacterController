@@ -87,10 +87,9 @@ public class TopdownCharacterController : MonoBehaviour
 	// ==== Private Variables ====
 
 	private const string ALL_TAG = "All";
-	private const string FACE_LEFT = "FaceLeft";
-	private const string FACE_RIGHT = "FaceRight";
-	private const string FACE_UP = "FaceUp";
-	private const string FACE_DOWN = "FaceDown";
+	private const string DIRECTION_HORIZONTAL = "DirectionHorizontal";
+	private const string DIRECTION_VERTICAL = "DirectionVertical";
+	private const string SPEED = "Speed";
 
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
@@ -125,7 +124,6 @@ public class TopdownCharacterController : MonoBehaviour
 
 	private void Start()
 	{
-		Animator = GetComponent<Animator>();
 		_renderer = GetComponent<Renderer>();
 		_rb = GetComponent<Rigidbody2D>();
 
@@ -141,6 +139,16 @@ public class TopdownCharacterController : MonoBehaviour
 		// Ensures the rigidbody is set up correctly.
 		_rb.isKinematic = true;
 		_rb.useFullKinematicContacts = true;
+
+		// Gets and sets up the animator.
+		Animator = GetComponent<Animator>();
+
+		if (Animator && HandleAnimationEvents)
+		{
+			Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+			Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+			Animator.SetFloat(SPEED, 0.0f);
+		}
 
 		// Sets the last hit taken time so the character can immediately start taking damage.
 		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
@@ -200,6 +208,14 @@ public class TopdownCharacterController : MonoBehaviour
 				// Moves at a constant speed toward to input direction.
 				_rb.velocity = Direction * MaxSpeed;
 			}
+
+			// Sets the animation properties.
+			if (Animator && HandleAnimationEvents)
+			{
+				Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+				Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+				Animator.SetFloat(SPEED, _rb.velocity.sqrMagnitude);
+			}
 		}
 		else
 		{
@@ -213,6 +229,10 @@ public class TopdownCharacterController : MonoBehaviour
 				// Brings the character to a complete stop.
 				_rb.velocity = Vector2.zero;
 			}
+
+			// Sets the animation speed property to 0.
+			if (Animator && HandleAnimationEvents)
+				Animator.SetFloat(SPEED, 0.0f);
 		}
 	}
 
@@ -234,7 +254,21 @@ public class TopdownCharacterController : MonoBehaviour
 					_destination = transform.position + (Vector3)input * TileSize;
 					_secondsSinceMovementStarted = currentTime;
 					Direction = input.normalized;
+
+					if (Animator && HandleAnimationEvents)
+					{
+						Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+						Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+						Animator.SetFloat(SPEED, 1.0f);
+					}
 				}
+
+				// If no input, set the animators speed property to zero.
+				// We do this here opposed to when the movement is complete to
+				//		avoid prematurely ending the animation between tiles
+				//		while a movement key is held.
+				else if (Animator && HandleAnimationEvents)
+					Animator.SetFloat(SPEED, 0.0f);
 			}
 		}
 
@@ -414,8 +448,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.x = Mathf.Min(_persistentInput.x + 1.0f, 1.0f);
 		else
 			_frameInput.x = Mathf.Min(_frameInput.x + 1.0f, 1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_RIGHT);
 	}
 
 	public void MoveLeft(bool persistent = false)
@@ -424,8 +456,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.x = Mathf.Max(_persistentInput.x - 1.0f, -1.0f);
 		else
 			_frameInput.x = Mathf.Max(_frameInput.x - 1.0f, -1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_LEFT);
 	}
 
 	public void MoveUp(bool persistent = false)
@@ -434,8 +464,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.y = Mathf.Min(_persistentInput.y + 1.0f, 1.0f);
 		else
 			_frameInput.y = Mathf.Min(_frameInput.y + 1.0f, 1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_UP);
 	}
 
 	public void MoveDown(bool persistent = false)
@@ -444,8 +472,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_persistentInput.y = Mathf.Max(_persistentInput.y - 1.0f, -1.0f);
 		else
 			_frameInput.y = Mathf.Max(_frameInput.y - 1.0f, -1.0f);
-
-		if (Animator) Animator.SetTrigger(FACE_DOWN);
 	}
 
 	public void ClearPersistentInput()
