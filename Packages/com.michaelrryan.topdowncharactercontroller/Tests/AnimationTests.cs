@@ -18,6 +18,11 @@ public class AnimationTests
 	private const string MOVING_UP = "MovingUp";
 	private const string MOVING_DOWN = "MovingDown";
 
+	private const string ATTACK_LEFT = "AttackLeft";
+	private const string ATTACK_RIGHT = "AttackRight";
+	private const string ATTACK_UP = "AttackUp";
+	private const string ATTACK_DOWN = "AttackDown";
+
 	private const string DEFAULT_ANIMATION = IDLE_DOWN;
 
 	[SetUp]
@@ -219,6 +224,73 @@ public class AnimationTests
 		player.MoveDown(true);
 		yield return new WaitForSeconds(0.1f);
 		Assert.AreEqual(MOVING_DOWN, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator MeleeAttackLeftAnimates()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.AttackCooldown = 1.0f;
+		player.MoveLeft();
+		player.Attack();
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ATTACK_LEFT, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator MeleeAttackRightAnimates()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.AttackCooldown = 1.0f;
+		player.MoveRight();
+		player.Attack();
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ATTACK_RIGHT, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator MeleeAttackUpwardAnimates()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.AttackCooldown = 1.0f;
+		player.MoveUp();
+		player.Attack();
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ATTACK_UP, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator MeleeAttackDownwardAnimates()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.AttackCooldown = 1.0f;
+		player.MoveDown();
+		player.Attack();
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator TilebasedMeleeAttackAnimates()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.TilebasedMovement = true;
+		player.AttackCooldown = 1.0f;
+		player.MoveDown();
+		player.Attack();
+		yield return new WaitForSeconds(0.1f);
+		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Animator));
+	}
+
+	[UnityTest]
+	public IEnumerator ReturnsToIdleAfterMelee()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		player.AttackCooldown = 0.1f;
+		player.MoveDown();
+		player.Attack();
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
 	}
 
 	private string GetCurrentClipName(Animator animator)

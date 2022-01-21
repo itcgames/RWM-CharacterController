@@ -6,7 +6,7 @@ using UnityEngine;
 public class TestUtilities
 {
 	public const string DEFAULT_CHARACTER_NAME = "Player";
-	public const string DEFAULT_SCENE_NAME = "DemoScene";
+	public const string DEFAULT_SCENE_NAME = "ZeldaDemoScene";
 
 	public static TopdownCharacterController GetCharacterByName(string name)
 	{

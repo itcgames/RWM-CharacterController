@@ -90,6 +90,8 @@ public class TopdownCharacterController : MonoBehaviour
 	private const string DIRECTION_HORIZONTAL = "DirectionHorizontal";
 	private const string DIRECTION_VERTICAL = "DirectionVertical";
 	private const string SPEED = "Speed";
+	private const string MELEE_SPEED_MULTIPLIER = "MeleeSpeedMultiplier";
+	private const string MELEE_ATTACK = "MeleeAttack";
 
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
@@ -150,11 +152,8 @@ public class TopdownCharacterController : MonoBehaviour
 			Animator.SetFloat(SPEED, 0.0f);
 		}
 
-		// Sets the last hit taken time so the character can immediately start taking damage.
-		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
-
-		// Sets the last attack time so the character can immediately start attacking.
-		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
+		SetDamageGracePeriod(_damageGracePeriod);
+		SetAttackCooldown(_attackCooldown);
 	}
 
 	private void Update()
@@ -338,6 +337,10 @@ public class TopdownCharacterController : MonoBehaviour
 	{
 		_attackCooldown = value;
 		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
+
+		// If handling animation events, set the melee animation speed multiplier.
+		if (Animator && HandleAnimationEvents)
+			Animator.SetFloat(MELEE_SPEED_MULTIPLIER, 1.0f / _attackCooldown);
 	}
 
 	private void SetTilebasedMovement(bool value)
@@ -403,6 +406,10 @@ public class TopdownCharacterController : MonoBehaviour
 
 			if (FreezeOnAttack)
 				_rb.velocity = Vector2.zero;
+
+			// If handling animation events, trigger the melee attack animation.
+			if (Animator && HandleAnimationEvents)
+				Animator.SetTrigger(MELEE_ATTACK);
 		}
 	}
 
