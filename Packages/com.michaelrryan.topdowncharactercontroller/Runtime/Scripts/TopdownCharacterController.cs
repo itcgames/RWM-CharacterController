@@ -136,12 +136,6 @@ public class TopdownCharacterController : MonoBehaviour
 			_rb = GetComponent<Rigidbody2D>();
 		}
 
-		_rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
-
-		// Ensures the rigidbody is set up correctly.
-		_rb.isKinematic = true;
-		_rb.useFullKinematicContacts = true;
-
 		// Gets and sets up the animator.
 		Animator = GetComponent<Animator>();
 
