@@ -9,6 +9,7 @@ using UnityEngine.TestTools;
 public class CollisionTests
 {
 	private const string ENEMY_NAME = "Enemy";
+	private const string PROJECTILE_NAME = "BasicProjectile(Clone)";
 
 	[SetUp]
 	public void Setup()
@@ -67,5 +68,23 @@ public class CollisionTests
 		player.MoveLeft(true);
 		yield return new WaitForSeconds(0.1f);
 		Assert.AreEqual(enemyPos, enemy.transform.position);
+	}
+
+	[UnityTest]
+	public IEnumerator ProjectilesDontCollideWithShooter()
+	{
+		var player = TestUtilities.GetDefaultCharacter();
+		TopdownRangedAttack ranged = player.GetComponent<TopdownRangedAttack>();
+
+		// Takes a copy of the player's position before firing.
+		Vector3 playerPos = player.transform.position;
+
+		// Fires a projectile.
+		ranged.Fire(Vector2.left);
+		yield return new WaitForSeconds(0.1f);
+
+		// Checks the player has not moved and projectile still exists.
+		Assert.AreEqual(playerPos, player.transform.position);
+		Assert.NotNull(GameObject.Find(PROJECTILE_NAME));
 	}
 }
