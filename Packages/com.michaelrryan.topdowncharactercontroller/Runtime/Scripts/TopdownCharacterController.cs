@@ -343,11 +343,19 @@ public class TopdownCharacterController : MonoBehaviour
 
 		if (_tilebasedMovement)
 		{
-			if (_rb) _rb.velocity = Vector2.zero;
+			if (_rb)
+			{
+				_rb.velocity = Vector2.zero;
+				_rb.isKinematic = true;
+			}
+            
 			_diagonalMovement = false;
 		}
 		else
+        {
+			if (_rb) _rb.isKinematic = false;
 			_diagonalMovement = _diagonalMovementAllowed;
+		}
 	}
 
 	private void SetDiagonalMovementAllowed(bool value)
