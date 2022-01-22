@@ -19,6 +19,7 @@ public class TopdownRangedAttack : MonoBehaviour
 
 	private float _lastAttackTime;
 	private TopdownCharacterController controller;
+	private Collider2D collider;
 
 	public GameObject Fire(Vector2 direction)
 	{
@@ -44,6 +45,11 @@ public class TopdownRangedAttack : MonoBehaviour
 			Projectile projectile = projectileObj.GetComponent<Projectile>();
 			projectile.ShootersTag = tag;
 
+			// Ensures the projectile doesn't collide with the shooter.
+			Collider2D projectCollider = projectile.GetComponent<Collider2D>();
+			if (collider && projectCollider)
+				Physics2D.IgnoreCollision(projectCollider, collider, true);
+
 			// If handling animation events, trigger the ranged attack animation.
 			if (controller && controller.Animator && controller.HandleAnimationEvents)
 				controller.Animator.SetTrigger(RANGED_ATTACK);
@@ -60,6 +66,7 @@ public class TopdownRangedAttack : MonoBehaviour
 		SetCooldown(_cooldown);
 
 		controller = GetComponent<TopdownCharacterController>();
+		collider = GetComponent<Collider2D>();
 	}
 
 	private void OnValidate()
