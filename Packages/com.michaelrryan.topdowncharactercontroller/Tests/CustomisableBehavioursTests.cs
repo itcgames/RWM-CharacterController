@@ -7,10 +7,12 @@ using UnityEngine.SceneManagement;
 
 public class CustomisableBehavioursTests
 {
+    const string BEHAVIOUR_TEST_SCENE = "BehaviourTestScene";
+
     [SetUp]
     public void Setup()
     {
-        SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
+        SceneManager.LoadScene(BEHAVIOUR_TEST_SCENE);
     }
 
     // A test class to be used in SlottingInNewBehaviours().

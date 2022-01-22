@@ -80,10 +80,18 @@ public class TopdownCharacterController : MonoBehaviour
 	public float TileSize = 1.0f;
 	public float SecondsPerTile = 0.25f;
 
+	[Header("Animation")]
+	public bool HandleAnimationEvents = true;
+	public Animator Animator;
 
 	// ==== Private Variables ====
 
 	private const string ALL_TAG = "All";
+	private const string DIRECTION_HORIZONTAL = "DirectionHorizontal";
+	private const string DIRECTION_VERTICAL = "DirectionVertical";
+	private const string SPEED = "Speed";
+	private const string MELEE_SPEED_MULTIPLIER = "MeleeSpeedMultiplier";
+	private const string MELEE_ATTACK = "MeleeAttack";
 
 	private Rigidbody2D _rb;
 	private Renderer _renderer;
@@ -134,11 +142,18 @@ public class TopdownCharacterController : MonoBehaviour
 		_rb.isKinematic = true;
 		_rb.useFullKinematicContacts = true;
 
-		// Sets the last hit taken time so the character can immediately start taking damage.
-		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
+		// Gets and sets up the animator.
+		Animator = GetComponent<Animator>();
 
-		// Sets the last attack time so the character can immediately start attacking.
-		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
+		if (Animator && HandleAnimationEvents)
+		{
+			Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+			Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+			Animator.SetFloat(SPEED, 0.0f);
+		}
+
+		SetDamageGracePeriod(_damageGracePeriod);
+		SetAttackCooldown(_attackCooldown);
 	}
 
 	private void Update()
@@ -192,6 +207,14 @@ public class TopdownCharacterController : MonoBehaviour
 				// Moves at a constant speed toward to input direction.
 				_rb.velocity = Direction * MaxSpeed;
 			}
+
+			// Sets the animation properties.
+			if (Animator && HandleAnimationEvents)
+			{
+				Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+				Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+				Animator.SetFloat(SPEED, _rb.velocity.sqrMagnitude);
+			}
 		}
 		else
 		{
@@ -205,6 +228,10 @@ public class TopdownCharacterController : MonoBehaviour
 				// Brings the character to a complete stop.
 				_rb.velocity = Vector2.zero;
 			}
+
+			// Sets the animation speed property to 0.
+			if (Animator && HandleAnimationEvents)
+				Animator.SetFloat(SPEED, 0.0f);
 		}
 	}
 
@@ -226,7 +253,21 @@ public class TopdownCharacterController : MonoBehaviour
 					_destination = transform.position + (Vector3)input * TileSize;
 					_secondsSinceMovementStarted = currentTime;
 					Direction = input.normalized;
+
+					if (Animator && HandleAnimationEvents)
+					{
+						Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
+						Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
+						Animator.SetFloat(SPEED, 1.0f);
+					}
 				}
+
+				// If no input, set the animators speed property to zero.
+				// We do this here opposed to when the movement is complete to
+				//		avoid prematurely ending the animation between tiles
+				//		while a movement key is held.
+				else if (Animator && HandleAnimationEvents)
+					Animator.SetFloat(SPEED, 0.0f);
 			}
 		}
 
@@ -296,6 +337,10 @@ public class TopdownCharacterController : MonoBehaviour
 	{
 		_attackCooldown = value;
 		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
+
+		// If handling animation events, set the melee animation speed multiplier.
+		if (Animator && HandleAnimationEvents)
+			Animator.SetFloat(MELEE_SPEED_MULTIPLIER, 1.0f / _attackCooldown);
 	}
 
 	private void SetTilebasedMovement(bool value)
@@ -361,6 +406,10 @@ public class TopdownCharacterController : MonoBehaviour
 
 			if (FreezeOnAttack)
 				_rb.velocity = Vector2.zero;
+
+			// If handling animation events, trigger the melee attack animation.
+			if (Animator && HandleAnimationEvents)
+				Animator.SetTrigger(MELEE_ATTACK);
 		}
 	}
 

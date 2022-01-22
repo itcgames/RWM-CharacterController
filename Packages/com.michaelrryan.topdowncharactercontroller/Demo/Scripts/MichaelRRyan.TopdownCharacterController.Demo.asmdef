@@ -1,0 +1,15 @@
+{
+    "name": "MichaelRRyan.TopdownCharacterController.Demo",
+    "references": [
+        "GUID:2afa372eb10b6744096506284ce59a77"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

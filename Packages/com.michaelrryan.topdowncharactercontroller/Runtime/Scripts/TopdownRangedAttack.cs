@@ -14,7 +14,11 @@ public class TopdownRangedAttack : MonoBehaviour
 	public bool LimitedAmmo = false;
 	public int Ammo = 0;
 
+	private const string RANGED_SPEED_MULTIPLIER = "RangedSpeedMultiplier";
+	private const string RANGED_ATTACK = "RangedAttack";
+
 	private float _lastAttackTime;
+	private TopdownCharacterController controller;
 
 	public GameObject Fire(Vector2 direction)
 	{
@@ -40,6 +44,10 @@ public class TopdownRangedAttack : MonoBehaviour
 			Projectile projectile = projectileObj.GetComponent<Projectile>();
 			projectile.ShootersTag = tag;
 
+			// If handling animation events, trigger the ranged attack animation.
+			if (controller && controller.Animator && controller.HandleAnimationEvents)
+				controller.Animator.SetTrigger(RANGED_ATTACK);
+
 			return projectileObj;
 		}
 
@@ -50,6 +58,8 @@ public class TopdownRangedAttack : MonoBehaviour
 	{
 		// Ensures no cooldown needs to be waited on when the scene begins.
 		SetCooldown(_cooldown);
+
+		controller = GetComponent<TopdownCharacterController>();
 	}
 
 	private void OnValidate()
@@ -64,5 +74,9 @@ public class TopdownRangedAttack : MonoBehaviour
 
 		// Sets the last attack time so no cooldown needs to be waited on.
 		_lastAttackTime = Time.time - _cooldown * 2.0f;
+
+		// If handling animation events, set the ranged animation speed multiplier.
+		if (controller && controller.Animator && controller.HandleAnimationEvents)
+			controller.Animator.SetFloat(RANGED_SPEED_MULTIPLIER, 1.0f / _cooldown);
 	}
 }
