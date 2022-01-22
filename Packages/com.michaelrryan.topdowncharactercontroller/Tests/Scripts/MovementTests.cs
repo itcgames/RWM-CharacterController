@@ -136,12 +136,12 @@ public class MovementTests
         var player = TestUtilities.GetDefaultCharacter();
 
         // A small buffer to allow for timing based issues in the test.
-        const float TimeErrorBuffer = 0.01f;
+        const float TimeErrorBuffer = 0.1f;
 
         // Sets up the character for tile based movement.
         player.TilebasedMovement = true;
         player.SecondsPerTile = 0.75f;
-        player.TileSize = 1.27f;
+        player.TileSize = 1.0f;
 
         // Works out the character's position after moving one tile.
         Vector3 destination = player.transform.position 
