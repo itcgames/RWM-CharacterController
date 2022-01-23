@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1980428845053700228}
   - component: {fileID: 325779765397784859}
   - component: {fileID: 895033564009344863}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BasicProjectile
   m_TagString: Projectile
   m_Icon: {fileID: 0}
@@ -166,5 +166,5 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.2}
+  m_Size: {x: 0.8, y: 0.1}
   m_EdgeRadius: 0
