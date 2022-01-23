@@ -55,9 +55,9 @@ MonoBehaviour:
   Direction: {x: 0, y: -1}
   PreferHorizontal: 0
   _diagonalMovementAllowed: 1
-  MaxSpeed: 5
-  _timeToMaxSpeed: 0
-  _timeToFullStop: 0
+  MaxSpeed: 4
+  _timeToMaxSpeed: 0.25
+  _timeToFullStop: 0.15
 --- !u!114 &4710276032706675751
 MonoBehaviour:
   m_ObjectHideFlags: 0
