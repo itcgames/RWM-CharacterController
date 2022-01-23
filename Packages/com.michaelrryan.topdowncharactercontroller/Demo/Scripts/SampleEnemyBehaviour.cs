@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SampleEnemyBehaviour : CharacterBehaviour
+namespace TopdownCharacterController
 {
-    new void Start()
+    public class SampleEnemyBehaviour : CharacterBehaviour
     {
-        base.Start();
+        new void Start()
+        {
+            base.Start();
 
-        Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
-        rigidbody.isKinematic = true;
+            Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
+            rigidbody.isKinematic = true;
+        }
     }
 }

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.SceneManagement;
+using TopdownCharacterController;
 
 public class CustomisableBehavioursTests
 {

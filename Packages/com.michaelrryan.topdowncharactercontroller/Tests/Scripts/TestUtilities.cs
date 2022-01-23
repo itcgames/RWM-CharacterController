@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections;
 using UnityEngine;
+using TopdownCharacterController;
 
 
 public class TestUtilities
