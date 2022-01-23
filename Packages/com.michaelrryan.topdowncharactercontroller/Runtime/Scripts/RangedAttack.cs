@@ -8,11 +8,8 @@ public class RangedAttack : MonoBehaviour
 
 	[SerializeField]
 	private float _cooldown = 0.5f;
-	public float Cooldown
-	{
-		get { return _cooldown; }
-		set { SetCooldown(value); }
-	}
+	public float Cooldown { get { return _cooldown; }
+							set { SetCooldown(value); } }
 
 	public bool LimitedAmmo = false;
 	public int Ammo = 0;

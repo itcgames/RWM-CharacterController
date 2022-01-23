@@ -22,33 +22,36 @@ public class MeleeAttackTests
 		const float ATTACK_DAMAGE = 1.0f;
 		const float ENEMY_HEALTH = 2.0f;
 
-		// Gets the characters.
-		var character = TestUtilities.GetDefaultCharacter();
-		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
+		// Gets the character behaviours.
+		CharacterBehaviour player = 
+			TestUtilities.GetDefaultCharactersBehaviour();
 
-		Health enemyHealth = enemy.GetComponent<Health>();
-		Assert.NotNull(enemy);
+		CharacterBehaviour enemy = 
+			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+
+		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(enemy.Health);
 
 		// Sets the attack radius, attack damage, and enemy health.
-		character.AttackRadius = ATTACK_RADIUS;
-		character.AttackDamage = ATTACK_DAMAGE;
-		enemyHealth.HP = ENEMY_HEALTH;
+		player.MeleeAttack.AttackRadius = ATTACK_RADIUS;
+		player.MeleeAttack.AttackDamage = ATTACK_DAMAGE;
+		enemy.Health.HP = ENEMY_HEALTH;
 
 		// Makes the character face the right.
-		character.MoveRight();
+		player.Controller.MoveRight();
 		yield return null;
 
 		// Positions the enemy.
-		enemy.transform.position = character.transform.position 
+		enemy.transform.position = player.transform.position 
 			+ Vector3.right * ATTACK_RADIUS;
 		yield return null;
-		
+
 		// Attacks and waits a frame.
-		character.Attack();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return null;
 
 		// Checks the enemy's health has decreased.
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemyHealth.HP);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health.HP);
 	}
 
 	[UnityTest]
@@ -61,42 +64,45 @@ public class MeleeAttackTests
 		const float ENEMY_HEALTH = 3.0f;
 		const float ENEMY_DAMAGE_GRACE_PERIOD = 0.0f;
 
-		// Gets the characters.
-		var character = TestUtilities.GetDefaultCharacter();
-		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
+		// Gets the character behaviours.
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
 
-		Health enemyHealth = enemy.GetComponent<Health>();
-		Assert.NotNull(enemy);
+		CharacterBehaviour enemy =
+			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+
+		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(enemy.Health);
 
 		// Sets the player and enemy properties.
-		character.AttackRadius = ATTACK_RADIUS;
-		character.AttackDamage = ATTACK_DAMAGE;
-		character.AttackCooldown = ATTACK_COOLDOWN;
-		enemyHealth.HP = ENEMY_HEALTH;
-		enemyHealth.DamageGracePeriod = ENEMY_DAMAGE_GRACE_PERIOD;
+		player.MeleeAttack.AttackRadius = ATTACK_RADIUS;
+		player.MeleeAttack.AttackDamage = ATTACK_DAMAGE;
+		player.MeleeAttack.AttackCooldown = ATTACK_COOLDOWN;
+		enemy.Health.HP = ENEMY_HEALTH;
+		enemy.Health.DamageGracePeriod = ENEMY_DAMAGE_GRACE_PERIOD;
 
 		// Makes the character face the right.
-		character.MoveRight();
+		player.Controller.MoveRight();
 		yield return null;
 
 		// Positions the enemy within attack range.
-		enemy.transform.position = character.transform.position
+		enemy.transform.position = player.transform.position
 			+ Vector3.right * ATTACK_RADIUS;
 		yield return null;
 
 
 		// CHECKS THE ATTACK WORKS.
 		// Attacks, waits a frame and checks the enemy's health has decreased.
-		character.Attack();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return null;
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemyHealth.HP);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health.HP);
 
 
 		// CHECK THE COOLDOWN STOPS THE ATTACK.
 		// Attacks, waits a frame and checks the enemy's health has not decreased further.
-		character.Attack();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return null;
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemyHealth.HP);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health.HP);
 
 
 		// CHECKS THE COOLDOWN HAS EXPIRED.
@@ -104,11 +110,11 @@ public class MeleeAttackTests
 		yield return new WaitForSeconds(ATTACK_COOLDOWN + 0.1f);
 
 		// Attacks and waits a frame.
-		character.Attack();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return null;
 
 		// Checks the enemy's health has not decreased further.
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE * 2.0f, enemyHealth.HP);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE * 2.0f, enemy.Health.HP);
 	}
 
 	[UnityTest]
@@ -119,43 +125,50 @@ public class MeleeAttackTests
 		const float DAMAGE_GRACE_PERIOD = 0.2f;
 		const float ENEMY_THORNS_DAMAGE = 0.5f;
 
-		// Gets the characters.
-		var player = TestUtilities.GetDefaultCharacter();
-		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
+		// Gets the character behaviours.
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
 
-		Health playerHealth = player.GetComponent<Health>();
-		Assert.NotNull(playerHealth);
+		CharacterBehaviour enemy =
+			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+
+		Assert.NotNull(player.Health);
+		Assert.NotNull(enemy.MeleeAttack);
 
 		// Sets the player and enemy properties.
-		playerHealth.HP = HEALTH;
-		playerHealth.DamageGracePeriod = DAMAGE_GRACE_PERIOD;
-		enemy.ThornsDamage = ENEMY_THORNS_DAMAGE;
+		player.Health.HP = HEALTH;
+		player.Health.DamageGracePeriod = DAMAGE_GRACE_PERIOD;
+		enemy.MeleeAttack.ThornsDamage = ENEMY_THORNS_DAMAGE;
 
 		// CHECKS THE PLAYER TAKES THORNS DAMAGE.
 		// Positions the player on the enemy, waits half the damage grace period..
 		player.transform.position = enemy.transform.position;
 		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD * 0.5f);
-		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, playerHealth.HP);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, player.Health.HP);
 
 		// Waits for the damage grace period to expire and check for additional damage.
 		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD + 0.05f);
-		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE * 2.0f, playerHealth.HP);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE * 2.0f, player.Health.HP);
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterFreezesOnAttack()
-    {
+	{
 		// Gets and sets up the character.
 		const float ATTACK_COOLDOWN = 0.25f;
 
-		var player = TestUtilities.GetDefaultCharacter();
-		player.FreezeOnAttack = true;
-		player.AttackCooldown = ATTACK_COOLDOWN;
+		// Gets the character behaviours.
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
+
+		Assert.NotNull(player.MeleeAttack);
+		player.MeleeAttack.FreezeOnAttack = true;
+		player.MeleeAttack.AttackCooldown = ATTACK_COOLDOWN;
 
 		// Gets the player's position, attacks, and moves down.
 		Vector3 position = player.transform.position;
-		player.Attack();
-		player.MoveDown(true);
+		player.MeleeAttack.Attack(player.Controller.Direction);
+		player.Controller.MoveDown(true);
 
 		// Waits 0.1 seconds and checks the position is still the same.
 		yield return new WaitForSeconds(0.1f);

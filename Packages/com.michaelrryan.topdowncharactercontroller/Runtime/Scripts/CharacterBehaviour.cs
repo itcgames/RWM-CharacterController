@@ -6,6 +6,7 @@ public abstract class CharacterBehaviour : MonoBehaviour
 {
     public TopdownCharacterController Controller { get; private set; }
     public Health Health { get; private set; }
+    public MeleeAttack MeleeAttack { get; private set; }
     public RangedAttack RangedAttack { get; private set; }
 
     public void Start()
@@ -19,6 +20,7 @@ public abstract class CharacterBehaviour : MonoBehaviour
         else
         {
             Health = GetComponent<Health>();
+            MeleeAttack = GetComponent<MeleeAttack>();
             RangedAttack = GetComponent<RangedAttack>();
         }
     }

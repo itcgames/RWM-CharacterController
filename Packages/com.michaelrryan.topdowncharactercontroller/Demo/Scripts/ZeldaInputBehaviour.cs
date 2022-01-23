@@ -10,7 +10,7 @@ public class ZeldaInputBehaviour : CharacterBehaviour
     {
         base.Start();
 
-        Health.HP = _maxHealth;
+        if (Health) Health.HP = _maxHealth;
         Controller.PreferHorizontal = true;
     }
 
@@ -26,10 +26,10 @@ public class ZeldaInputBehaviour : CharacterBehaviour
 
         if (Input.GetKey(KeyCode.C))
         {
-            if (Health.HP == _maxHealth)
+            if (Health && Health.HP == _maxHealth)
                 RangedAttack.Fire(Controller.Direction);
 
-            Controller.Attack();
+            if (MeleeAttack) MeleeAttack.Attack(Controller.Direction);
         }
     }
 }

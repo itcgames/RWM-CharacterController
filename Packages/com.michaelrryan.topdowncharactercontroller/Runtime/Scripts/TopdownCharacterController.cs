@@ -7,19 +7,6 @@ public class TopdownCharacterController : MonoBehaviour
 {
 	// ==== Properties ====
 
-	[Header("Combat")]
-
-	public float AttackDamage = 1.0f;
-	public float AttackRadius = 0.5f;
-
-	[SerializeField]
-	private float _attackCooldown = 0.5f;
-	public float AttackCooldown { get { return _attackCooldown; }
-								  set { SetAttackCooldown(value); } }
-
-	public float ThornsDamage = 0.0f;
-	public bool FreezeOnAttack = false;
-
 	[Header("Movement")]
 	[SerializeField]
 	private bool _tilebasedMovement = false;
@@ -64,15 +51,14 @@ public class TopdownCharacterController : MonoBehaviour
 	private const string DIRECTION_HORIZONTAL = "DirectionHorizontal";
 	private const string DIRECTION_VERTICAL = "DirectionVertical";
 	private const string SPEED = "Speed";
-	private const string MELEE_SPEED_MULTIPLIER = "MeleeSpeedMultiplier";
-	private const string MELEE_ATTACK = "MeleeAttack";
+
+	private MeleeAttack _meleeAttack;
 
 	private Rigidbody2D _rb;
 	private Vector2 _frameInput = Vector2.zero;
 	private Vector2 _persistentInput = Vector2.zero;
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
-	private float _lastAttackTime = 0.0f;
 
 	// Used internally for both regular and tilebased movement, similar to
 	//      _diagonalMovementAllowed but can change without a users intention.
@@ -116,7 +102,7 @@ public class TopdownCharacterController : MonoBehaviour
 			Animator.SetFloat(SPEED, 0.0f);
 		}
 
-		SetAttackCooldown(_attackCooldown);
+		_meleeAttack = GetComponent<MeleeAttack>();
 	}
 
 	private void Update()
@@ -129,20 +115,6 @@ public class TopdownCharacterController : MonoBehaviour
 		_frameInput = Vector2.zero;
 	}
 
-	private void OnCollisionStay2D(Collision2D collision)
-	{
-		if (ThornsDamage != 0.0f)
-		{
-			Health characterHealth = 
-				collision.collider.GetComponent<Health>();
-
-			// If a character health component was retrieved, damages it.
-			if (characterHealth)
-				characterHealth.TakeDamage(ThornsDamage, tag);
-		}
-	}
-
-
 	// ==== Custom Methods ====
 
 	private void UpdateRegularMovement()
@@ -151,7 +123,8 @@ public class TopdownCharacterController : MonoBehaviour
 
 		// If there's input and not frozen on attack.
 		if (input != Vector2.zero 
-			&& (!FreezeOnAttack || CanAttack()))
+			&& (_meleeAttack == null || !_meleeAttack.FreezeOnAttack
+				|| _meleeAttack.CanAttack()))
 		{
 			Direction = input.normalized;
 
@@ -206,7 +179,8 @@ public class TopdownCharacterController : MonoBehaviour
 		if (_secondsSinceMovementStarted == null)
 		{
 			// If freeze on attack is enabled, check the attack cooldown has expired.
-			if (!FreezeOnAttack || CanAttack())
+			if (_meleeAttack == null || !_meleeAttack.FreezeOnAttack 
+				|| _meleeAttack.CanAttack())
 			{
 				Vector2 input = GetInput();
 
@@ -283,16 +257,6 @@ public class TopdownCharacterController : MonoBehaviour
 
 	// ==== Setter Methods ====
 
-	private void SetAttackCooldown(float value)
-	{
-		_attackCooldown = value;
-		_lastAttackTime = Time.time - _attackCooldown * 2.0f;
-
-		// If handling animation events, set the melee animation speed multiplier.
-		if (Animator && HandleAnimationEvents)
-			Animator.SetFloat(MELEE_SPEED_MULTIPLIER, 1.0f / _attackCooldown);
-	}
-
 	private void SetTilebasedMovement(bool value)
 	{
 		_tilebasedMovement = value;
@@ -343,38 +307,6 @@ public class TopdownCharacterController : MonoBehaviour
 	}
 
 	// ==== Public Methods ====
-
-	public void Attack()
-	{
-		// Checks the attack cooldown has expired before attacking.
-		if (CanAttack())
-		{
-			_lastAttackTime = Time.time;
-
-			// Finds all colliders within a radius in front of the character.
-			Vector2 attackPosition = (Vector2)transform.position + Direction * AttackRadius;
-			Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
-
-			// Check through colliders and damages any character's with a health component.
-			foreach (Collider2D collider in colliders)
-			{
-				Health characterHealth = collider.GetComponent<Health>();
-				if (characterHealth) characterHealth.TakeDamage(AttackDamage, tag);
-			}
-
-			if (FreezeOnAttack)
-				_rb.velocity = Vector2.zero;
-
-			// If handling animation events, trigger the melee attack animation.
-			if (Animator && HandleAnimationEvents)
-				Animator.SetTrigger(MELEE_ATTACK);
-		}
-	}
-
-	public bool CanAttack()
-	{
-		return Time.time >= _lastAttackTime + _attackCooldown;
-	}
 
 	public void MoveRight(bool persistent = false)
 	{

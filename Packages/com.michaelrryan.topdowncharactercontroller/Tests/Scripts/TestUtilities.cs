@@ -21,9 +21,27 @@ public class TestUtilities
 		return character;
 	}
 
+	public static CharacterBehaviour GetBehaviourByCharacterName(string name)
+    {
+		// Finds the character by name and ensures it's not null.
+		GameObject characterObj = GameObject.Find(name);
+		Assert.NotNull(characterObj);
+
+		// Gets the character behaviour and ensures it's not null.
+		var behaviour = characterObj.GetComponent<CharacterBehaviour>();
+		Assert.NotNull(behaviour);
+
+		return behaviour;
+	}
+
 	public static TopdownCharacterController GetDefaultCharacter()
 	{
 		return GetCharacterByName(DEFAULT_CHARACTER_NAME);
+	}
+
+	public static CharacterBehaviour GetDefaultCharactersBehaviour()
+	{
+		return GetBehaviourByCharacterName(DEFAULT_CHARACTER_NAME);
 	}
 
 	public static string GetDefaultSceneName()

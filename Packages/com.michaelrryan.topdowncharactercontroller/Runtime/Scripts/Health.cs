@@ -10,11 +10,8 @@ public class Health : MonoBehaviour
 
 	[SerializeField]
 	private float _damageGracePeriod = 0.8f;
-	public float DamageGracePeriod
-	{
-		get { return _damageGracePeriod; }
-		set { SetDamageGracePeriod(value); }
-	}
+	public float DamageGracePeriod { get { return _damageGracePeriod; }
+									 set { SetDamageGracePeriod(value); } }
 
 	public int GracePeriodFlashes = 4;
 	public List<string> DamageWhitelistTags = new List<string>();
@@ -71,7 +68,7 @@ public class Health : MonoBehaviour
 	}
 
 	void Start()
-    {
+	{
 		_renderer = GetComponent<Renderer>();
 		SetDamageGracePeriod(_damageGracePeriod);
 	}

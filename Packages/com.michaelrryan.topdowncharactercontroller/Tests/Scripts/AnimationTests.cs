@@ -236,68 +236,86 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator MeleeAttackLeftAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveLeft();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Controller.MoveLeft();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_LEFT, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_LEFT, GetCurrentClipName(player.Controller.Animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackRightAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveRight();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Controller.MoveRight();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_RIGHT, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_RIGHT, GetCurrentClipName(player.Controller.Animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackUpwardAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveUp();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Controller.MoveUp();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_UP, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_UP, GetCurrentClipName(player.Controller.Animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackDownwardAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveDown();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Controller.MoveDown();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Controller.Animator));
 	}
 
 	[UnityTest]
 	public IEnumerator TilebasedMeleeAttackAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.AttackCooldown = 1.0f;
-		player.MoveDown();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.MeleeAttack);
+
+		player.Controller.TilebasedMovement = true;
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Controller.MoveDown();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Controller.Animator));
 	}
 
 	[UnityTest]
 	public IEnumerator ReturnsToIdleAfterMelee()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 0.1f;
-		player.MoveDown();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 0.1f;
+
+		player.Controller.MoveDown();
+		player.MeleeAttack.Attack(player.Controller.Direction);
 		yield return new WaitForSeconds(0.2f);
-		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Controller.Animator));
 	}
 
 	[UnityTest]
@@ -330,7 +348,7 @@ public class AnimationTests
 	}
 
 	private string GetCurrentClipName(Animator animator)
-    {
+	{
 		var info = animator.GetCurrentAnimatorClipInfo(0);
 		Assert.IsNotEmpty(info);
 		return info[0].clip.name;
