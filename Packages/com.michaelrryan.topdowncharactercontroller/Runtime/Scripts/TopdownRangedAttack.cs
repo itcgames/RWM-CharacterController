@@ -18,8 +18,8 @@ public class TopdownRangedAttack : MonoBehaviour
 	private const string RANGED_ATTACK = "RangedAttack";
 
 	private float _lastAttackTime;
-	private TopdownCharacterController controller;
-	private Collider2D collider;
+	private TopdownCharacterController _controller;
+	private Collider2D _collider;
 
 	public GameObject Fire(Vector2 direction)
 	{
@@ -47,12 +47,12 @@ public class TopdownRangedAttack : MonoBehaviour
 
 			// Ensures the projectile doesn't collide with the shooter.
 			Collider2D projectCollider = projectile.GetComponent<Collider2D>();
-			if (collider && projectCollider)
-				Physics2D.IgnoreCollision(projectCollider, collider, true);
+			if (_collider && projectCollider)
+				Physics2D.IgnoreCollision(projectCollider, _collider, true);
 
 			// If handling animation events, trigger the ranged attack animation.
-			if (controller && controller.Animator && controller.HandleAnimationEvents)
-				controller.Animator.SetTrigger(RANGED_ATTACK);
+			if (_controller && _controller.Animator && _controller.HandleAnimationEvents)
+				_controller.Animator.SetTrigger(RANGED_ATTACK);
 
 			return projectileObj;
 		}
@@ -65,8 +65,8 @@ public class TopdownRangedAttack : MonoBehaviour
 		// Ensures no cooldown needs to be waited on when the scene begins.
 		SetCooldown(_cooldown);
 
-		controller = GetComponent<TopdownCharacterController>();
-		collider = GetComponent<Collider2D>();
+		_controller = GetComponent<TopdownCharacterController>();
+		_collider = GetComponent<Collider2D>();
 	}
 
 	private void OnValidate()
@@ -83,7 +83,7 @@ public class TopdownRangedAttack : MonoBehaviour
 		_lastAttackTime = Time.time - _cooldown * 2.0f;
 
 		// If handling animation events, set the ranged animation speed multiplier.
-		if (controller && controller.Animator && controller.HandleAnimationEvents)
-			controller.Animator.SetFloat(RANGED_SPEED_MULTIPLIER, 1.0f / _cooldown);
+		if (_controller && _controller.Animator && _controller.HandleAnimationEvents)
+			_controller.Animator.SetFloat(RANGED_SPEED_MULTIPLIER, 1.0f / _cooldown);
 	}
 }

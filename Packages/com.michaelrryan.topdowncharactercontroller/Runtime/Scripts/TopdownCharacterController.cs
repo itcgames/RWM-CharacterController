@@ -244,15 +244,27 @@ public class TopdownCharacterController : MonoBehaviour
 				if (input != Vector2.zero)
 				{
 					_previousPosition = transform.position;
-					_destination = transform.position + (Vector3)input * TileSize;
-					_secondsSinceMovementStarted = currentTime;
+					Vector3 dest = transform.position + (Vector3)input * TileSize;
+
+					// Checks there's no colliders in the next tile before moving.
+					if (Physics2D.OverlapBox(dest, new Vector2(
+						TileSize - 0.1f, TileSize - 0.1f), 0.0f) == null)
+                    {
+						_destination = dest;
+						_secondsSinceMovementStarted = currentTime;
+						Direction = input.normalized;
+
+						if (Animator && HandleAnimationEvents)
+							Animator.SetFloat(SPEED, 1.0f);
+					}
+
+					// Updates the direction property and animator.
 					Direction = input.normalized;
 
 					if (Animator && HandleAnimationEvents)
 					{
 						Animator.SetFloat(DIRECTION_HORIZONTAL, Direction.x);
 						Animator.SetFloat(DIRECTION_VERTICAL, Direction.y);
-						Animator.SetFloat(SPEED, 1.0f);
 					}
 				}
 
@@ -343,11 +355,19 @@ public class TopdownCharacterController : MonoBehaviour
 
 		if (_tilebasedMovement)
 		{
-			if (_rb) _rb.velocity = Vector2.zero;
+			if (_rb)
+			{
+				_rb.velocity = Vector2.zero;
+				_rb.isKinematic = true;
+			}
+			
 			_diagonalMovement = false;
 		}
 		else
+		{
+			if (_rb) _rb.isKinematic = false;
 			_diagonalMovement = _diagonalMovementAllowed;
+		}
 	}
 
 	private void SetDiagonalMovementAllowed(bool value)
