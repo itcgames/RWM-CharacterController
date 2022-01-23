@@ -4,14 +4,112 @@ using UnityEngine;
 
 namespace TopdownCharacterController
 {
-    public class SampleEnemyBehaviour : CharacterBehaviour
-    {
-        new void Start()
-        {
-            base.Start();
+	public class SampleEnemyBehaviour : CharacterBehaviour
+	{
+		private float ACTION_INTERVAL = 1.0f;
+		private float _lastActionTime;
 
-            Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
-            rigidbody.isKinematic = true;
-        }
-    }
+		// The maximum distance the enemy is able to walk during an action
+		//		interval.
+		private float _actionMovementDistance;
+
+		CapsuleCollider2D _collider;
+
+		private new void Start()
+		{
+			base.Start();
+
+			Rigidbody2D rigidbody = GetComponent<Rigidbody2D>();
+			_collider = GetComponent<CapsuleCollider2D>();
+
+			// Disables the script if it doesn't have the necessary components.
+			if (!_collider || !rigidbody || !TopdownMovement)
+				enabled = false;
+			else
+			{
+				rigidbody.isKinematic = true;
+
+				_lastActionTime = Time.time - ACTION_INTERVAL;
+				_actionMovementDistance = ACTION_INTERVAL * TopdownMovement.MaxSpeed;
+			}
+		}
+
+		private void Update()
+		{
+			// If the action interval has elapsed, act again.
+			if (Time.time >= _lastActionTime + ACTION_INTERVAL)
+			{
+				// Sets the new last action time.
+				_lastActionTime = Time.time;
+
+				// Clears all previous input.
+				Movement.ClearPersistentInput();
+
+				// Performs a random action.
+				PerformRandomAction();
+			}
+		}
+
+		private void PerformRandomAction()
+		{
+			bool actionFound = false;
+
+			while (!actionFound)
+            {
+				int action = Random.Range(0, 5);
+
+				// Moves in a direction depending on the action number, if the
+				//		direction is not blocked.
+				// Does nothing if the action number is 0.
+				switch (action)
+				{
+					case 0:
+						actionFound = true;
+						break;
+					case 1:
+						if (!IsDirectionBlocked(Vector2.left))
+                        {
+							Movement.MoveLeft(true);
+							actionFound = true;
+						}
+						break;
+					case 2:
+						if (!IsDirectionBlocked(Vector2.right))
+						{
+							Movement.MoveRight(true);
+							actionFound = true;
+						}
+						break;
+					case 3:
+						if (!IsDirectionBlocked(Vector2.up))
+						{
+							Movement.MoveUp(true);
+							actionFound = true;
+						}
+						break;
+					case 4:
+						if (!IsDirectionBlocked(Vector2.down))
+						{
+							Movement.MoveDown(true);
+							actionFound = true;
+						}
+						break;
+				}
+			}
+		}
+			
+
+		private bool IsDirectionBlocked(Vector2 direction)
+		{
+			Vector2 nextPosition = (Vector2)transform.position 
+				+ direction * _actionMovementDistance;
+
+			Collider2D collided = Physics2D.OverlapCircle(nextPosition,
+				_collider.size.x / 2.0f);
+
+			// If a collision with something other then the player occured,
+			//		returns true.
+			return collided != null && !collided.CompareTag("Player");
+		}
+	}
 }
