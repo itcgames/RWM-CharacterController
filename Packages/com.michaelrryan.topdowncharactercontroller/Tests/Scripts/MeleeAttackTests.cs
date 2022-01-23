@@ -26,10 +26,13 @@ public class MeleeAttackTests
 		var character = TestUtilities.GetDefaultCharacter();
 		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
 
+		Health enemyHealth = enemy.GetComponent<Health>();
+		Assert.NotNull(enemy);
+
 		// Sets the attack radius, attack damage, and enemy health.
 		character.AttackRadius = ATTACK_RADIUS;
 		character.AttackDamage = ATTACK_DAMAGE;
-		enemy.Health = ENEMY_HEALTH;
+		enemyHealth.HP = ENEMY_HEALTH;
 
 		// Makes the character face the right.
 		character.MoveRight();
@@ -45,7 +48,7 @@ public class MeleeAttackTests
 		yield return null;
 
 		// Checks the enemy's health has decreased.
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemyHealth.HP);
 	}
 
 	[UnityTest]
@@ -62,12 +65,15 @@ public class MeleeAttackTests
 		var character = TestUtilities.GetDefaultCharacter();
 		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
 
+		Health enemyHealth = enemy.GetComponent<Health>();
+		Assert.NotNull(enemy);
+
 		// Sets the player and enemy properties.
 		character.AttackRadius = ATTACK_RADIUS;
 		character.AttackDamage = ATTACK_DAMAGE;
 		character.AttackCooldown = ATTACK_COOLDOWN;
-		enemy.Health = ENEMY_HEALTH;
-		enemy.DamageGracePeriod = ENEMY_DAMAGE_GRACE_PERIOD;
+		enemyHealth.HP = ENEMY_HEALTH;
+		enemyHealth.DamageGracePeriod = ENEMY_DAMAGE_GRACE_PERIOD;
 
 		// Makes the character face the right.
 		character.MoveRight();
@@ -83,14 +89,14 @@ public class MeleeAttackTests
 		// Attacks, waits a frame and checks the enemy's health has decreased.
 		character.Attack();
 		yield return null;
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemyHealth.HP);
 
 
 		// CHECK THE COOLDOWN STOPS THE ATTACK.
 		// Attacks, waits a frame and checks the enemy's health has not decreased further.
 		character.Attack();
 		yield return null;
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemyHealth.HP);
 
 
 		// CHECKS THE COOLDOWN HAS EXPIRED.
@@ -102,7 +108,7 @@ public class MeleeAttackTests
 		yield return null;
 
 		// Checks the enemy's health has not decreased further.
-		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE * 2.0f, enemy.Health);
+		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE * 2.0f, enemyHealth.HP);
 	}
 
 	[UnityTest]
@@ -117,20 +123,23 @@ public class MeleeAttackTests
 		var player = TestUtilities.GetDefaultCharacter();
 		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
 
+		Health playerHealth = player.GetComponent<Health>();
+		Assert.NotNull(playerHealth);
+
 		// Sets the player and enemy properties.
-		player.Health = HEALTH;
-		player.DamageGracePeriod = DAMAGE_GRACE_PERIOD;
+		playerHealth.HP = HEALTH;
+		playerHealth.DamageGracePeriod = DAMAGE_GRACE_PERIOD;
 		enemy.ThornsDamage = ENEMY_THORNS_DAMAGE;
 
 		// CHECKS THE PLAYER TAKES THORNS DAMAGE.
 		// Positions the player on the enemy, waits half the damage grace period..
 		player.transform.position = enemy.transform.position;
 		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD * 0.5f);
-		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, player.Health);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, playerHealth.HP);
 
 		// Waits for the damage grace period to expire and check for additional damage.
 		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD + 0.05f);
-		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE * 2.0f, player.Health);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE * 2.0f, playerHealth.HP);
 	}
 
 	[UnityTest]

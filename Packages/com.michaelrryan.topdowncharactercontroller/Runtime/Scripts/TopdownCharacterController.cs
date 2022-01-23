@@ -7,31 +7,6 @@ public class TopdownCharacterController : MonoBehaviour
 {
 	// ==== Properties ====
 
-	[Header("Health & Damage")]
-
-	[SerializeField]
-	private float _health = 5.0f;
-	public float Health { get { return _health; }
-						  set { _health = value; } }
-
-	[SerializeField]
-	private float _damageGracePeriod = 0.8f;
-	public float DamageGracePeriod { get { return _damageGracePeriod; }
-									 set { SetDamageGracePeriod(value); } }
-
-	[SerializeField]
-	private int _gracePeriodFlashes = 4;
-	public int GracePeriodFlashes { get { return _gracePeriodFlashes; }
-									set { _gracePeriodFlashes = value; } }
-
-	[SerializeField]
-	private List<string> _damageWhitelistTags = new List<string>();
-	public List<string> DamageWhitelistTags { get { return _damageWhitelistTags; }
-											  private set { } }
-
-	public delegate void DeathCallback();
-	public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
-
 	[Header("Combat")]
 
 	public float AttackDamage = 1.0f;
@@ -86,7 +61,6 @@ public class TopdownCharacterController : MonoBehaviour
 
 	// ==== Private Variables ====
 
-	private const string ALL_TAG = "All";
 	private const string DIRECTION_HORIZONTAL = "DirectionHorizontal";
 	private const string DIRECTION_VERTICAL = "DirectionVertical";
 	private const string SPEED = "Speed";
@@ -94,12 +68,10 @@ public class TopdownCharacterController : MonoBehaviour
 	private const string MELEE_ATTACK = "MeleeAttack";
 
 	private Rigidbody2D _rb;
-	private Renderer _renderer;
 	private Vector2 _frameInput = Vector2.zero;
 	private Vector2 _persistentInput = Vector2.zero;
 	private float _acceleration = 0.0f;
 	private float _deceleration = 0.0f;
-	private float _lastHitTaken = 0.0f;
 	private float _lastAttackTime = 0.0f;
 
 	// Used internally for both regular and tilebased movement, similar to
@@ -117,7 +89,6 @@ public class TopdownCharacterController : MonoBehaviour
 	private void OnValidate()
 	{
 		// Ensures the properties' set functions are called when one changes.
-		DamageGracePeriod = _damageGracePeriod;
 		TilebasedMovement = _tilebasedMovement;
 		DiagonalMovementAllowed = _diagonalMovementAllowed;
 		TimeToMaxSpeed = _timeToMaxSpeed;
@@ -126,7 +97,6 @@ public class TopdownCharacterController : MonoBehaviour
 
 	private void Start()
 	{
-		_renderer = GetComponent<Renderer>();
 		_rb = GetComponent<Rigidbody2D>();
 
 		// If no Rigidbody exists, add one.
@@ -146,7 +116,6 @@ public class TopdownCharacterController : MonoBehaviour
 			Animator.SetFloat(SPEED, 0.0f);
 		}
 
-		SetDamageGracePeriod(_damageGracePeriod);
 		SetAttackCooldown(_attackCooldown);
 	}
 
@@ -164,12 +133,12 @@ public class TopdownCharacterController : MonoBehaviour
 	{
 		if (ThornsDamage != 0.0f)
 		{
-			var character = 
-				collision.collider.GetComponent<TopdownCharacterController>();
+			Health characterHealth = 
+				collision.collider.GetComponent<Health>();
 
-			// If a character component was retrieved, damage it.
-			if (character)
-				character.TakeDamage(ThornsDamage, tag);
+			// If a character health component was retrieved, damages it.
+			if (characterHealth)
+				characterHealth.TakeDamage(ThornsDamage, tag);
 		}
 	}
 
@@ -249,7 +218,7 @@ public class TopdownCharacterController : MonoBehaviour
 					// Checks there's no colliders in the next tile before moving.
 					if (Physics2D.OverlapBox(dest, new Vector2(
 						TileSize - 0.1f, TileSize - 0.1f), 0.0f) == null)
-                    {
+					{
 						_destination = dest;
 						_secondsSinceMovementStarted = currentTime;
 						Direction = input.normalized;
@@ -312,32 +281,7 @@ public class TopdownCharacterController : MonoBehaviour
 		return input;
 	}
 
-	private IEnumerator FlashForGracePeriod()
-	{
-		yield return null;
-
-		// Checks there's a renderer as the character can't flash without it.
-		if (_renderer)
-		{
-			// Works out the number of iterations to flash for.
-			int iterations = _gracePeriodFlashes * 2;
-			for (int i = 0; i < iterations; ++i)
-			{
-				// Toggles the visibility and waits.
-				_renderer.enabled = !_renderer.enabled;
-				yield return new WaitForSeconds(_damageGracePeriod / iterations);
-			}
-		}
-	}
-
-
 	// ==== Setter Methods ====
-
-	private void SetDamageGracePeriod(float value)
-	{
-		_damageGracePeriod = value;
-		_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
-	}
 
 	private void SetAttackCooldown(float value)
 	{
@@ -411,11 +355,11 @@ public class TopdownCharacterController : MonoBehaviour
 			Vector2 attackPosition = (Vector2)transform.position + Direction * AttackRadius;
 			Collider2D[] colliders = Physics2D.OverlapCircleAll(attackPosition, AttackRadius);
 
-			// Check through colliders and damages any character controllers.
+			// Check through colliders and damages any character's with a health component.
 			foreach (Collider2D collider in colliders)
 			{
-				var character = collider.GetComponent<TopdownCharacterController>();
-				if (character) character.TakeDamage(AttackDamage, tag);
+				Health characterHealth = collider.GetComponent<Health>();
+				if (characterHealth) characterHealth.TakeDamage(AttackDamage, tag);
 			}
 
 			if (FreezeOnAttack)
@@ -430,37 +374,6 @@ public class TopdownCharacterController : MonoBehaviour
 	public bool CanAttack()
 	{
 		return Time.time >= _lastAttackTime + _attackCooldown;
-	}
-
-	public bool TakeDamage(float damage, string attackersTag = null)
-	{
-		// Checks the grace period has elapsed.
-		if (Time.time >= _lastHitTaken + _damageGracePeriod)
-		{
-			// Checks if the attackers tag is whitelisted to damage this object,
-			//		or if the whitelist contains "All".
-			if (attackersTag == null 
-				|| _damageWhitelistTags.Contains(attackersTag)
-				|| _damageWhitelistTags.Contains(ALL_TAG))
-			{
-				// Sets the new last hit taken time and takes the damage.
-				_lastHitTaken = Time.time;
-				_health -= damage;
-
-				// Checks if health has reached zero and destroys if so.
-				if (_health <= 0.0f)
-				{
-					foreach (var callback in DeathCallbacks) callback();
-					Destroy(gameObject);
-				}
-				// Starts the flash coroutine if not dead.
-				else StartCoroutine(FlashForGracePeriod());
-
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	public void MoveRight(bool persistent = false)

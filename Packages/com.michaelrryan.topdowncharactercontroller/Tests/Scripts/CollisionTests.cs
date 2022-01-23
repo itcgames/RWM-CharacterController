@@ -78,7 +78,7 @@ public class CollisionTests
 	public IEnumerator ProjectilesDontCollideWithShooter()
 	{
 		var player = TestUtilities.GetDefaultCharacter();
-		TopdownRangedAttack ranged = player.GetComponent<TopdownRangedAttack>();
+		RangedAttack ranged = player.GetComponent<RangedAttack>();
 
 		// Takes a copy of the player's position before firing.
 		Vector3 playerPos = player.transform.position;

@@ -10,7 +10,7 @@ public class ZeldaInputBehaviour : CharacterBehaviour
     {
         base.Start();
 
-        Controller.Health = _maxHealth;
+        Health.HP = _maxHealth;
         Controller.PreferHorizontal = true;
     }
 
@@ -26,7 +26,7 @@ public class ZeldaInputBehaviour : CharacterBehaviour
 
         if (Input.GetKey(KeyCode.C))
         {
-            if (Controller.Health == _maxHealth)
+            if (Health.HP == _maxHealth)
                 RangedAttack.Fire(Controller.Direction);
 
             Controller.Attack();

@@ -35,14 +35,14 @@ public class Projectile : MonoBehaviour
 
 	private void OnCollisionEnter2D(Collision2D collision)
 	{
-		// Tries to get a character controller component from the collider.
-		var controller =
-			collision.collider.GetComponent<TopdownCharacterController>();
+		// Tries to get a character health component from the collider.
+		Health characterHealth =
+			collision.collider.GetComponent<Health>();
 
-		// If a character controller was found, damages it.
-		if (controller)
+		// If a character health was found, damages it.
+		if (characterHealth)
 		{
-			bool damaged = controller.TakeDamage(Damage, ShootersTag);
+			bool damaged = characterHealth.TakeDamage(Damage, ShootersTag);
 
 			// If damage was done, destroys this object.
 			if (damaged)
@@ -50,7 +50,7 @@ public class Projectile : MonoBehaviour
 		}
 		else
 		{
-			// If the collider was not a character controller, destroys self.
+			// If the collider did not have a health component, destroys self.
 			Destroy(gameObject);
 		}
 	}

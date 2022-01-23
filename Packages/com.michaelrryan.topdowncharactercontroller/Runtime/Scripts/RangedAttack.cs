@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TopdownRangedAttack : MonoBehaviour
+public class RangedAttack : MonoBehaviour
 {
 	public GameObject projectilePrefab;
 
 	[SerializeField]
 	private float _cooldown = 0.5f;
-	public float Cooldown { get { return _cooldown; }
-							set { SetCooldown(value); } }
+	public float Cooldown
+	{
+		get { return _cooldown; }
+		set { SetCooldown(value); }
+	}
 
 	public bool LimitedAmmo = false;
 	public int Ammo = 0;
@@ -34,7 +37,7 @@ public class TopdownRangedAttack : MonoBehaviour
 			if (LimitedAmmo) Ammo--;
 
 			// Gets the direction as a quaternion.
-			Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, 0.0f, 
+			Quaternion rotation = Quaternion.Euler(new Vector3(0.0f, 0.0f,
 				Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg));
 
 			// Instantiates the projectile.

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1590756327094295977}
   - component: {fileID: 1590756327094295972}
+  - component: {fileID: 4710276032706675751}
   - component: {fileID: 5718288718091086199}
   - component: {fileID: 3401940656814232552}
   - component: {fileID: 8370774134762580273}
@@ -49,10 +50,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c04ef8e91389449e2f31cd53bc900, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _health: 5
-  _damageGracePeriod: 0.8
-  _gracePeriodFlashes: 4
-  _damageWhitelistTags: []
   AttackDamage: 1
   AttackRadius: 0.5
   _attackCooldown: 0.5
@@ -69,6 +66,22 @@ MonoBehaviour:
   SecondsPerTile: 0.25
   HandleAnimationEvents: 1
   Animator: {fileID: 0}
+--- !u!114 &4710276032706675751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590756327094295973}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b96915f5f0f3ca2489e1dbaca1058fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HP: 5
+  _damageGracePeriod: 0.8
+  GracePeriodFlashes: 4
+  DamageWhitelistTags: []
 --- !u!114 &5718288718091086199
 MonoBehaviour:
   m_ObjectHideFlags: 0

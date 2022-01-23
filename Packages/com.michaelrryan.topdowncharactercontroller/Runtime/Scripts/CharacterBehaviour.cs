@@ -5,7 +5,8 @@ using UnityEngine;
 public abstract class CharacterBehaviour : MonoBehaviour
 {
     public TopdownCharacterController Controller { get; private set; }
-    public TopdownRangedAttack RangedAttack { get; private set; }
+    public Health Health { get; private set; }
+    public RangedAttack RangedAttack { get; private set; }
 
     public void Start()
     {
@@ -16,6 +17,9 @@ public abstract class CharacterBehaviour : MonoBehaviour
         if (!Controller)
             enabled = false;
         else
-            RangedAttack = GetComponent<TopdownRangedAttack>();
+        {
+            Health = GetComponent<Health>();
+            RangedAttack = GetComponent<RangedAttack>();
+        }
     }
 }

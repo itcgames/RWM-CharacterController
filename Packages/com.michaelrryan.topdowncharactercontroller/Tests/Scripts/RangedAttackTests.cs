@@ -24,7 +24,7 @@ public class RangedAttackTests
 	public IEnumerator ProjectileFires()
 	{
 		// Gets the player's ranged attack component and checks it's not null.
-		TopdownRangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
 
 		// Fires a projectile.
@@ -46,7 +46,7 @@ public class RangedAttackTests
 	public IEnumerator CannotFireDuringCooldown()
 	{
 		// Gets the player's ranged attack component and checks it's not null.
-		TopdownRangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
 
 		// Fires a projectile and checks it's not null.
@@ -70,9 +70,11 @@ public class RangedAttackTests
 
 		// Gets the enemy character.
 		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
+		Health enemyHealth = enemy.GetComponent<Health>();
+		Assert.NotNull(enemyHealth);
 
 		// Gets the player's ranged attack component and checks it's not null.
-		TopdownRangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
 
 		// Positions the player to the left of the enemy.
@@ -84,12 +86,12 @@ public class RangedAttackTests
 		Projectile projectile = projectileObj.GetComponent<Projectile>();
 
 		// Gets the enemies health and waits for the bullet to hit.
-		float enemyHealth = enemy.Health;
+		float enemyHP = enemyHealth.HP;
 		yield return new WaitForSeconds((PROJECTILE_DISTANCE / projectile.Speed)
 			+ SAFETY_MARGIN);
 
 		// Checks that the enemy took damage and the projectile no longer exists.
-		Assert.AreEqual(enemyHealth - projectile.Damage, enemy.Health);
+		Assert.AreEqual(enemyHP - projectile.Damage, enemyHealth.HP);
 		Assert.IsNull(GameObject.Find(PROJECTILE_NAME));
 	}
 
@@ -99,7 +101,7 @@ public class RangedAttackTests
 		const float PROJECTILE_EXPIRE_TIME = 0.1f;
 
 		// Gets the player's ranged attack component and checks it's not null.
-		TopdownRangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
 
 		// Gets the projectile component.
@@ -134,7 +136,7 @@ public class RangedAttackTests
 		const float COOLDOWN = 0.1f;
 
 		// Gets the player's ranged attack component and checks it's not null.
-		TopdownRangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
 
 		// Setup the player's ranged attack component.
@@ -158,13 +160,13 @@ public class RangedAttackTests
 		Assert.Null(failed);
 	}
 
-	private TopdownRangedAttack GetDefaultRangedAttackComponent()
+	private RangedAttack GetDefaultRangedAttackComponent()
 	{
 		// Gets the player character.
 		TopdownCharacterController player =
 			TestUtilities.GetDefaultCharacter();
 
 		// Gets and returns the ranged attack component.
-		return player.GetComponent<TopdownRangedAttack>();
+		return player.GetComponent<RangedAttack>();
 	}
 }

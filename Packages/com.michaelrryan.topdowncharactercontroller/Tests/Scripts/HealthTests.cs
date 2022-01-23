@@ -26,33 +26,32 @@ public class HealthTests
 	{
 		// Damages the character equal to its health, waits a frame and
 		//      checks they are now null.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.TakeDamage(character.Health);
+		Health health = GetDefaultCharacterHealth();
+		health.TakeDamage(health.HP);
 		yield return null;
-
 		Assert.Null(GameObject.Find(TestUtilities.DEFAULT_CHARACTER_NAME));
 	}
 
 	[UnityTest]
 	public IEnumerator NoDamageTakenDuringGracePeriod()
 	{
-		var character = TestUtilities.GetDefaultCharacter();
+		Health health = GetDefaultCharacterHealth();
 
 		// Stashes these to avoid interfering with the wait time.
-		float waitTime = character.DamageGracePeriod * 0.25f;
-		float halfHealth = character.Health * 0.5f;
+		float waitTime = health.DamageGracePeriod * 0.25f;
+		float halfHealth = health.HP * 0.5f;
 
 		// Damages the character equal to half its health and stores the
 		//      remaining health.
-		character.TakeDamage(halfHealth);
-		float health = character.Health;
+		health.TakeDamage(halfHealth);
+		float hp = health.HP;
 
 		// Waits half the grace period and tries to attack again.
 		yield return new WaitForSeconds(waitTime);
-		character.TakeDamage(halfHealth);
+		health.TakeDamage(halfHealth);
 
 		// Checks that the health has not changed.
-		Assert.AreEqual(health, character.Health);
+		Assert.AreEqual(hp, health.HP);
 	}
 
 	[UnityTest]
@@ -62,12 +61,12 @@ public class HealthTests
 		const float ERROR_MARGIN = 0.05f;
 
 		// Damages the character equal to half its health.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.TakeDamage(character.Health / 2.0f);
+		Health health = GetDefaultCharacterHealth();
+		health.TakeDamage(health.HP / 2.0f);
 
 		// Waits for the grace period to end and tries to attack again.
-		yield return new WaitForSeconds(character.DamageGracePeriod + ERROR_MARGIN);
-		character.TakeDamage(character.Health);
+		yield return new WaitForSeconds(health.DamageGracePeriod + ERROR_MARGIN);
+		health.TakeDamage(health.HP);
 
 		// Waits a frame and checks the character is dead.
 		yield return null;
@@ -89,18 +88,18 @@ public class HealthTests
 		float flashLength = gracePeriod / (flashes * 2);
 		float halfFlash = flashLength * 0.5f;
 
-		// Gets the character and sets up the fields.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.DamageGracePeriod = gracePeriod;
-		character.GracePeriodFlashes = flashes;
+		// Gets the character's health component and sets up the fields.
+		Health health = GetDefaultCharacterHealth();
+		health.DamageGracePeriod = gracePeriod;
+		health.GracePeriodFlashes = flashes;
 
 		// Takes reference to the character's renderer and ensures its not null.
-		Renderer renderer = character.GetComponent<Renderer>();
+		Renderer renderer = health.GetComponent<Renderer>();
 		Assert.IsNotNull(renderer);
 
 		// Damage the character and checks the character is invisible less than
 		//      one flash length later.
-		character.TakeDamage(character.Health / 2.0f);
+		health.TakeDamage(health.HP / 2.0f);
 		yield return new WaitForSeconds(halfFlash);
 		Assert.IsFalse(renderer.enabled);
 
@@ -112,82 +111,91 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator IsVisibleAfterGracePeriod()
 	{
-		// Gets the character and the renderer.
-		var character = TestUtilities.GetDefaultCharacter();
-		Renderer renderer = character.GetComponent<Renderer>();
+		// Gets the character's health and renderer components.
+		Health health = GetDefaultCharacterHealth();
+		Renderer renderer = health.GetComponent<Renderer>();
 		Assert.IsNotNull(renderer);
 
 		// Damages the character and checks its visible after the grace period.
-		character.TakeDamage(character.Health / 2.0f);
-		yield return new WaitForSeconds(character.DamageGracePeriod);
+		health.TakeDamage(health.HP / 2.0f);
+		yield return new WaitForSeconds(health.DamageGracePeriod);
 		Assert.IsTrue(renderer.enabled);
 	}
 
 	[UnityTest]
 	public IEnumerator WhitelistedTagsCanDamage()
 	{
-		// Gets the character and whitelists the "Enemy" tag.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.DamageWhitelistTags.Add("Enemy");
+		// Gets the character's health component and whitelists the "Enemy" tag.
+		Health health = GetDefaultCharacterHealth();
+		health.DamageWhitelistTags.Add("Enemy");
 
 		// Takes a copy for later.
-		float health = character.Health;
+		float hp = health.HP;
 
 		// Damages the character, passing the whitelisted tag.
-		character.TakeDamage(character.Health / 2.0f, "Enemy");
+		health.TakeDamage(health.HP / 2.0f, "Enemy");
 
 		// Checks the character's health has gone down the next frame.
 		yield return null;
-		Assert.Less(character.Health, health);
+		Assert.Less(health.HP, hp);
 	}
 
 	[UnityTest]
 	public IEnumerator NonWhitelistedTagsCannotDamage()
 	{
-		// Gets the character and whitelists the "Enemy" tag.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.DamageWhitelistTags.Add("Enemy");
+		// Gets the character's health component and whitelists the "Enemy" tag.
+		Health health = GetDefaultCharacterHealth();
+		health.DamageWhitelistTags.Add("Enemy");
 
 		// Takes a copy for later.
-		float health = character.Health;
+		float hp = health.HP;
 
 		// Damages the character, passing the a non whitelisted tag.
-		character.TakeDamage(character.Health / 2.0f, "Friend");
+		health.TakeDamage(health.HP / 2.0f, "Friend");
 
 		// Checks the character's health has not changed.
 		yield return null;
-		Assert.AreEqual(character.Health, health);
+		Assert.AreEqual(health.HP, hp);
 	}
 
 	[UnityTest]
 	public IEnumerator AllWhitelistTagAllowsAnyTag()
-    {
-		// Gets the character and whitelists the "All" tag.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.DamageWhitelistTags.Add("All");
+	{
+		// Gets the character's health component and whitelists the "All" tag.
+		Health health = GetDefaultCharacterHealth();
+		health.DamageWhitelistTags.Add("All");
 
 		// Takes a copy for later.
-		float health = character.Health;
+		float hp = health.HP;
 
 		// Damages the character, passing a non whitelisted tag.
-		character.TakeDamage(character.Health / 2.0f, "Enemy");
+		health.TakeDamage(health.HP / 2.0f, "Enemy");
 
 		// Checks the character's health has gone down the next frame.
 		yield return null;
-		Assert.Less(character.Health, health);
+		Assert.Less(health.HP, hp);
 	}
 
 	[UnityTest]
 	public IEnumerator DeathCallbacksAreRunOnDeath()
 	{
-		// Gets the character adds the callback and initialises the checker variable.
-		var character = TestUtilities.GetDefaultCharacter();
-		character.DeathCallbacks.Add(DeathCallback);
+		// Gets the character's health component, adds the callback and
+		//		initialises the checker variable.
+		Health health = GetDefaultCharacterHealth();
+		health.DeathCallbacks.Add(DeathCallback);
 		_deathCallbackRun = false;
 
 		// Kills the character and checks the callback was run next frame.
-		character.TakeDamage(character.Health);
+		health.TakeDamage(health.HP);
 		yield return null;
 		Assert.IsTrue(_deathCallbackRun);
+	}
+
+	private Health GetDefaultCharacterHealth()
+	{
+		var character = TestUtilities.GetDefaultCharacter();
+		Health health = character.GetComponent<Health>();
+		Assert.NotNull(health);
+		return health;
 	}
 }
