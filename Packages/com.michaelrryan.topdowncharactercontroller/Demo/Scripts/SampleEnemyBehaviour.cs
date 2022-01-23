@@ -6,8 +6,13 @@ namespace TopdownCharacterController
 {
 	public class SampleEnemyBehaviour : CharacterBehaviour
 	{
-		private float ACTION_INTERVAL = 1.0f;
+		public GameObject projectile;
+
+		private const float ACTION_INTERVAL = 1.0f;
+		private const float MAX_FIRE_INTERVAL = 10.0f;
+
 		private float _lastActionTime;
+		private float _lastFireTime;
 
 		// The maximum distance the enemy is able to walk during an action
 		//		interval.
@@ -23,7 +28,7 @@ namespace TopdownCharacterController
 			_collider = GetComponent<CapsuleCollider2D>();
 
 			// Disables the script if it doesn't have the necessary components.
-			if (!_collider || !rigidbody || !TopdownMovement)
+			if (!_collider || !rigidbody || !TopdownMovement || !RangedAttack)
 				enabled = false;
 			else
 			{
@@ -31,6 +36,8 @@ namespace TopdownCharacterController
 
 				_lastActionTime = Time.time - ACTION_INTERVAL;
 				_actionMovementDistance = ACTION_INTERVAL * TopdownMovement.MaxSpeed;
+
+				RangedAttack.projectilePrefab = projectile;
 			}
 		}
 
@@ -45,8 +52,9 @@ namespace TopdownCharacterController
 				// Clears all previous input.
 				Movement.ClearPersistentInput();
 
-				// Performs a random action.
+				// Performs a random action and has a change to fire a projectile.
 				PerformRandomAction();
+				PossiblyFireAProjectile();
 			}
 		}
 
@@ -98,7 +106,6 @@ namespace TopdownCharacterController
 			}
 		}
 			
-
 		private bool IsDirectionBlocked(Vector2 direction)
 		{
 			Vector2 nextPosition = (Vector2)transform.position 
@@ -110,6 +117,20 @@ namespace TopdownCharacterController
 			// If a collision with something other then the player occured,
 			//		returns true.
 			return collided != null && !collided.CompareTag("Player");
+		}
+
+		private void PossiblyFireAProjectile()
+        {
+			// Works out the chance to fire. Get's closer to 100% as time without
+			//      firing increases.
+			float timeSinceLastShot = Time.time - _lastFireTime;
+			int shotChance = (int)Mathf.Max(MAX_FIRE_INTERVAL - timeSinceLastShot, 0.0f);
+
+			if (Random.Range(0, shotChance) == 0)
+			{
+				_lastFireTime = Time.time;
+				RangedAttack.Fire(Movement.Direction);
+			}
 		}
 	}
 }
