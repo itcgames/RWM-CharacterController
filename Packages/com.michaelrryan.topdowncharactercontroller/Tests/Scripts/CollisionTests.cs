@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-
+using TopdownCharacterController;
 
 public class CollisionTests
 {
@@ -15,24 +15,22 @@ public class CollisionTests
 	//		to elapse to avoid falling under on different powered machines.
 	const float SAFETY_MARGIN = 0.1f;
 
-	[SetUp]
-	public void Setup()
-	{
-		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
-	}
-
 	[UnityTest]
 	public IEnumerator CharacterIsBlockedByWalls()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
+		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
+		yield return null;
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.TopdownMovement);
 
 		// Positions the player by the bottom wall and sets its properties.
 		player.transform.position = new Vector3(0.0f, -3.0f);
-		player.MaxSpeed = 20.0f; // 20 Unity units per second.
-		player.TimeToMaxSpeed = 0.0f;
+		player.TopdownMovement.MaxSpeed = 20.0f; // 20 Unity units per second.
+		player.TopdownMovement.TimeToMaxSpeed = 0.0f;
 
 		// Moves down and checks the player has been blocked.
-		player.MoveDown(true);
+		player.Movement.MoveDown(true);
 		yield return new WaitForSeconds(0.1f);
 		Assert.Greater(player.transform.position.y, -3.5f);
 	}
@@ -40,16 +38,20 @@ public class CollisionTests
 	[UnityTest]
 	public IEnumerator CharacterIsBlockedByCharacters()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		var enemy = TestUtilities.GetCharacterByName(ENEMY_NAME);
+		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
+		yield return null;
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_NAME);
+		Assert.NotNull(player.TopdownMovement);
 
 		// Positions the player by the enemy and sets its properties.
 		player.transform.position = enemy.transform.position + Vector3.right;
-		player.MaxSpeed = 20.0f; // 20 Unity units per second.
-		player.TimeToMaxSpeed = 0.0f;
+		player.TopdownMovement.MaxSpeed = 20.0f; // 20 Unity units per second.
+		player.TopdownMovement.TimeToMaxSpeed = 0.0f;
 
 		// Moves left into the enemy and checks the player has been blocked.
-		player.MoveLeft(true);
+		player.Movement.MoveLeft(true);
 		yield return new WaitForSeconds(0.1f);
 		Assert.Greater(player.transform.position.x, enemy.transform.position.x);
 	}
@@ -57,19 +59,23 @@ public class CollisionTests
 	[UnityTest]
 	public IEnumerator CollidingEnemyIsUnmoved()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		var enemy = TestUtilities.GetCharacterByName(ENEMY_NAME);
+		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
+		yield return null;
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_NAME);
+		Assert.NotNull(player.TopdownMovement);
 
 		// Positions the player by the enemy and sets its properties.
 		player.transform.position = enemy.transform.position + Vector3.right;
-		player.MaxSpeed = 20.0f; // 20 Unity units per second.
-		player.TimeToMaxSpeed = 0.0f;
+		player.TopdownMovement.MaxSpeed = 20.0f; // 20 Unity units per second.
+		player.TopdownMovement.TimeToMaxSpeed = 0.0f;
 
 		// Take a copy of the enemy's position before collision.
 		Vector3 enemyPos = enemy.transform.position;
 
 		// Moves left into the enemy and checks the enemy has not moved.
-		player.MoveLeft(true);
+		player.Movement.MoveLeft(true);
 		yield return new WaitForSeconds(0.1f);
 		Assert.AreEqual(enemyPos, enemy.transform.position);
 	}
@@ -77,8 +83,11 @@ public class CollisionTests
 	[UnityTest]
 	public IEnumerator ProjectilesDontCollideWithShooter()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		TopdownRangedAttack ranged = player.GetComponent<TopdownRangedAttack>();
+		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
+		yield return null;
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		RangedAttack ranged = player.GetComponent<RangedAttack>();
 
 		// Takes a copy of the player's position before firing.
 		Vector3 playerPos = player.transform.position;
@@ -95,28 +104,32 @@ public class CollisionTests
 	[UnityTest]
 	public IEnumerator CharactersDontMoveToBlockedTiles()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.SecondsPerTile = 0.1f;
+		SceneManager.LoadScene(TestUtilities.TILEBASED_SCENE_NAME);
+		yield return null;
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(player.TilebasedMovement);
+
+		player.TilebasedMovement.SecondsPerTile = 0.1f;
 
 		// Player should be blocked after the first movement.
-		player.MoveRight();
-		yield return new WaitForSeconds(player.SecondsPerTile + SAFETY_MARGIN);
+		player.Movement.MoveRight();
+		yield return new WaitForSeconds(player.TilebasedMovement.SecondsPerTile + SAFETY_MARGIN);
 
 		// Gets the position of the player before trying to move.
 		Vector3 playerPos = player.transform.position;
 
 		// Try to move and make sure the player was blocked.
-		player.MoveRight();
-		yield return new WaitForSeconds(player.SecondsPerTile + SAFETY_MARGIN);
+		player.Movement.MoveRight();
+		yield return new WaitForSeconds(player.TilebasedMovement.SecondsPerTile + SAFETY_MARGIN);
 		Assert.AreEqual(playerPos, player.transform.position);
 
 		// If the character ignores blocked tiles, we should be able to move
 		//		right after being blocked.
-		player.MoveRight();
+		player.Movement.MoveRight();
 		yield return null;
-		player.MoveUp();
-		yield return new WaitForSeconds(player.SecondsPerTile + SAFETY_MARGIN);
+		player.Movement.MoveUp();
+		yield return new WaitForSeconds(player.TilebasedMovement.SecondsPerTile + SAFETY_MARGIN);
 		Assert.AreNotEqual(playerPos, player.transform.position);
 	}
 }

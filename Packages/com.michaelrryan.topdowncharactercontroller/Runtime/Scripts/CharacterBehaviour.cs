@@ -2,20 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class CharacterBehaviour : MonoBehaviour
+namespace TopdownCharacterController
 {
-    public TopdownCharacterController Controller { get; private set; }
-    public TopdownRangedAttack RangedAttack { get; private set; }
-
-    public void Start()
+    public abstract class CharacterBehaviour : MonoBehaviour
     {
-        // Tries to get the character controller component.
-        Controller = GetComponent<TopdownCharacterController>();
+        // A generic reference to the movement component.
+        public Movement Movement { get; private set; }
 
-        // Disables this behaviour if no controller found.
-        if (!Controller)
-            enabled = false;
-        else
-            RangedAttack = GetComponent<TopdownRangedAttack>();
+        // In most cases, only one of these should be valid, while the other is null.
+        public TopdownMovement TopdownMovement { get; private set; }
+        public TilebasedMovement TilebasedMovement { get; private set; }
+
+        public Health Health { get; private set; }
+        public MeleeAttack MeleeAttack { get; private set; }
+        public RangedAttack RangedAttack { get; private set; }
+
+        public void Start()
+        {
+            Movement = GetComponent<Movement>();
+            TopdownMovement = GetComponent<TopdownMovement>();
+            TilebasedMovement = GetComponent<TilebasedMovement>();
+            Health = GetComponent<Health>();
+            MeleeAttack = GetComponent<MeleeAttack>();
+            RangedAttack = GetComponent<RangedAttack>();
+        }
     }
 }

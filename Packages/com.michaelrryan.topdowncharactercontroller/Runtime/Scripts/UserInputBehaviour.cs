@@ -2,32 +2,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UserInputBehaviour : CharacterBehaviour
+namespace TopdownCharacterController
 {
-    void Update()
-    {
-        // Horizontal Input.
-        if (Input.GetKey(KeyCode.LeftArrow)) Controller.MoveLeft();
-        if (Input.GetKey(KeyCode.RightArrow)) Controller.MoveRight();
+	public class UserInputBehaviour : CharacterBehaviour
+	{
+		new void Start()
+		{
+			base.Start();
 
-        // Vertical Input.
-        if (Input.GetKey(KeyCode.UpArrow)) Controller.MoveUp();
-        if (Input.GetKey(KeyCode.DownArrow)) Controller.MoveDown();
+			// Disables the behaviour if the required components are null.
+			if (!Movement || !MeleeAttack || !RangedAttack)
+				enabled = false;
+		}
 
-        if (!Controller.DiagonalMovementAllowed)
-        {
-            // Checks for which direction was pressed last.
-            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-                Controller.PreferHorizontal = true;
-            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-                Controller.PreferHorizontal = false;
-        }
+		void Update()
+		{
+			// Horizontal Input.
+			if (Input.GetKey(KeyCode.LeftArrow)) Movement.MoveLeft();
+			if (Input.GetKey(KeyCode.RightArrow)) Movement.MoveRight();
 
-        if (Input.GetKey(KeyCode.C))
-            Controller.Attack();
+			// Vertical Input.
+			if (Input.GetKey(KeyCode.UpArrow)) Movement.MoveUp();
+			if (Input.GetKey(KeyCode.DownArrow)) Movement.MoveDown();
 
-        if (RangedAttack && Input.GetKeyDown(KeyCode.X))
-            RangedAttack.Fire(Controller.Direction);
+			if (!Movement.DiagonalMovement)
+			{
+				// Checks for which direction was pressed last.
+				if (Input.GetKeyDown(KeyCode.LeftArrow) 
+						|| Input.GetKeyDown(KeyCode.RightArrow))
+					Movement.PreferHorizontal = true;
 
-    }
+				else if (Input.GetKeyDown(KeyCode.UpArrow) 
+						|| Input.GetKeyDown(KeyCode.DownArrow))
+					Movement.PreferHorizontal = false;
+			}
+
+			if (Input.GetKey(KeyCode.C))
+				MeleeAttack.Attack(Movement.Direction);
+
+			if (Input.GetKeyDown(KeyCode.X))
+				RangedAttack.Fire(Movement.Direction);
+
+		}
+	}
 }

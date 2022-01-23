@@ -2,34 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ZeldaInputBehaviour : CharacterBehaviour
+namespace TopdownCharacterController
 {
-    private float _maxHealth = 4.0f;
-
-    new void Start()
+    public class ZeldaInputBehaviour : CharacterBehaviour
     {
-        base.Start();
+        private float _maxHealth = 4.0f;
 
-        Controller.Health = _maxHealth;
-        Controller.PreferHorizontal = true;
-    }
-
-    void Update()
-    {
-        // Horizontal Input.
-        if (Input.GetKey(KeyCode.LeftArrow)) Controller.MoveLeft();
-        if (Input.GetKey(KeyCode.RightArrow)) Controller.MoveRight();
-
-        // Vertical Input.
-        if (Input.GetKey(KeyCode.UpArrow)) Controller.MoveUp();
-        if (Input.GetKey(KeyCode.DownArrow)) Controller.MoveDown();
-
-        if (Input.GetKey(KeyCode.C))
+        new void Start()
         {
-            if (Controller.Health == _maxHealth)
-                RangedAttack.Fire(Controller.Direction);
+            base.Start();
 
-            Controller.Attack();
+            // Disables the behaviour if the required components are null.
+            if (!Movement || !MeleeAttack || !RangedAttack || !Health)
+                enabled = false;
+            else
+            {
+                Health.HP = _maxHealth;
+                Movement.PreferHorizontal = true;
+            }
+        }
+
+        void Update()
+        {
+            // Horizontal Input.
+            if (Input.GetKey(KeyCode.LeftArrow)) Movement.MoveLeft();
+            if (Input.GetKey(KeyCode.RightArrow)) Movement.MoveRight();
+
+            // Vertical Input.
+            if (Input.GetKey(KeyCode.UpArrow)) Movement.MoveUp();
+            if (Input.GetKey(KeyCode.DownArrow)) Movement.MoveDown();
+
+            if (Input.GetKey(KeyCode.C))
+            {
+                if (Health && Health.HP == _maxHealth)
+                    RangedAttack.Fire(Movement.Direction);
+
+                if (MeleeAttack) MeleeAttack.Attack(Movement.Direction);
+            }
         }
     }
 }
