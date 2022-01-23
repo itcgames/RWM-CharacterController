@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class RangedAttack : MonoBehaviour
 {
+	// ==== Properties ====
+
+	public bool HandleAnimationEvents = true;
 	public GameObject projectilePrefab;
 
 	[SerializeField]
@@ -14,12 +17,17 @@ public class RangedAttack : MonoBehaviour
 	public bool LimitedAmmo = false;
 	public int Ammo = 0;
 
+	// ==== Private Variables ====
+
 	private const string RANGED_SPEED_MULTIPLIER = "RangedSpeedMultiplier";
 	private const string RANGED_ATTACK = "RangedAttack";
 
-	private float _lastAttackTime;
-	private TopdownCharacterController _controller;
+	private Animator _animator;
 	private Collider2D _collider;
+
+	private float _lastAttackTime;
+
+	// ==== Public Custom Methods ====
 
 	public GameObject Fire(Vector2 direction)
 	{
@@ -51,8 +59,8 @@ public class RangedAttack : MonoBehaviour
 				Physics2D.IgnoreCollision(projectCollider, _collider, true);
 
 			// If handling animation events, trigger the ranged attack animation.
-			if (_controller && _controller.Animator && _controller.HandleAnimationEvents)
-				_controller.Animator.SetTrigger(RANGED_ATTACK);
+			if (_animator && HandleAnimationEvents)
+				_animator.SetTrigger(RANGED_ATTACK);
 
 			return projectileObj;
 		}
@@ -60,12 +68,14 @@ public class RangedAttack : MonoBehaviour
 		return null;
 	}
 
+	// ==== Unity Method Overrides ====
+
 	private void Start()
 	{
 		// Ensures no cooldown needs to be waited on when the scene begins.
 		SetCooldown(_cooldown);
 
-		_controller = GetComponent<TopdownCharacterController>();
+		_animator = GetComponent<Animator>();
 		_collider = GetComponent<Collider2D>();
 	}
 
@@ -75,6 +85,8 @@ public class RangedAttack : MonoBehaviour
 		Cooldown = _cooldown;
 	}
 
+	// ==== Private Custom Methods ====
+
 	private void SetCooldown(float value)
 	{
 		_cooldown = value;
@@ -83,7 +95,7 @@ public class RangedAttack : MonoBehaviour
 		_lastAttackTime = Time.time - _cooldown * 2.0f;
 
 		// If handling animation events, set the ranged animation speed multiplier.
-		if (_controller && _controller.Animator && _controller.HandleAnimationEvents)
-			_controller.Animator.SetFloat(RANGED_SPEED_MULTIPLIER, 1.0f / _cooldown);
+		if (_animator && HandleAnimationEvents)
+			_animator.SetFloat(RANGED_SPEED_MULTIPLIER, 1.0f / _cooldown);
 	}
 }

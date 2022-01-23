@@ -7,19 +7,8 @@ public class TestUtilities
 {
 	public const string DEFAULT_CHARACTER_NAME = "Player";
 	public const string DEFAULT_SCENE_NAME = "ZeldaDemoScene";
+	public const string TILEBASED_SCENE_NAME = "ZeldaTilebasedDemoScene";
 
-	public static TopdownCharacterController GetCharacterByName(string name)
-	{
-		// Finds the character by name and ensures it's not null.
-		GameObject characterObj = GameObject.Find(name);
-		Assert.NotNull(characterObj);
-
-		// Finds the character objects and ensures it's not null.
-		var character = characterObj.GetComponent<TopdownCharacterController>();
-		Assert.NotNull(character);
-
-		return character;
-	}
 
 	public static CharacterBehaviour GetBehaviourByCharacterName(string name)
     {
@@ -34,11 +23,6 @@ public class TestUtilities
 		return behaviour;
 	}
 
-	public static TopdownCharacterController GetDefaultCharacter()
-	{
-		return GetCharacterByName(DEFAULT_CHARACTER_NAME);
-	}
-
 	public static CharacterBehaviour GetDefaultCharactersBehaviour()
 	{
 		return GetBehaviourByCharacterName(DEFAULT_CHARACTER_NAME);
@@ -48,4 +32,11 @@ public class TestUtilities
     {
 		return DEFAULT_SCENE_NAME;
     }
+
+	public static string GetCurrentClipName(Animator animator)
+	{
+		var info = animator.GetCurrentAnimatorClipInfo(0);
+		Assert.IsNotEmpty(info);
+		return info[0].clip.name;
+	}
 }

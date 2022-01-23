@@ -30,6 +30,7 @@ public class MeleeAttackTests
 			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
 
 		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(player.Movement);
 		Assert.NotNull(enemy.Health);
 
 		// Sets the attack radius, attack damage, and enemy health.
@@ -38,7 +39,7 @@ public class MeleeAttackTests
 		enemy.Health.HP = ENEMY_HEALTH;
 
 		// Makes the character face the right.
-		player.Controller.MoveRight();
+		player.Movement.MoveRight();
 		yield return null;
 
 		// Positions the enemy.
@@ -47,7 +48,7 @@ public class MeleeAttackTests
 		yield return null;
 
 		// Attacks and waits a frame.
-		player.MeleeAttack.Attack(player.Controller.Direction);
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return null;
 
 		// Checks the enemy's health has decreased.
@@ -72,6 +73,7 @@ public class MeleeAttackTests
 			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
 
 		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(player.Movement);
 		Assert.NotNull(enemy.Health);
 
 		// Sets the player and enemy properties.
@@ -82,7 +84,7 @@ public class MeleeAttackTests
 		enemy.Health.DamageGracePeriod = ENEMY_DAMAGE_GRACE_PERIOD;
 
 		// Makes the character face the right.
-		player.Controller.MoveRight();
+		player.Movement.MoveRight();
 		yield return null;
 
 		// Positions the enemy within attack range.
@@ -93,14 +95,14 @@ public class MeleeAttackTests
 
 		// CHECKS THE ATTACK WORKS.
 		// Attacks, waits a frame and checks the enemy's health has decreased.
-		player.MeleeAttack.Attack(player.Controller.Direction);
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return null;
 		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health.HP);
 
 
 		// CHECK THE COOLDOWN STOPS THE ATTACK.
 		// Attacks, waits a frame and checks the enemy's health has not decreased further.
-		player.MeleeAttack.Attack(player.Controller.Direction);
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return null;
 		Assert.AreEqual(ENEMY_HEALTH - ATTACK_DAMAGE, enemy.Health.HP);
 
@@ -110,7 +112,7 @@ public class MeleeAttackTests
 		yield return new WaitForSeconds(ATTACK_COOLDOWN + 0.1f);
 
 		// Attacks and waits a frame.
-		player.MeleeAttack.Attack(player.Controller.Direction);
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return null;
 
 		// Checks the enemy's health has not decreased further.
@@ -162,13 +164,15 @@ public class MeleeAttackTests
 			TestUtilities.GetDefaultCharactersBehaviour();
 
 		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(player.Movement);
+
 		player.MeleeAttack.FreezeOnAttack = true;
 		player.MeleeAttack.AttackCooldown = ATTACK_COOLDOWN;
 
 		// Gets the player's position, attacks, and moves down.
 		Vector3 position = player.transform.position;
-		player.MeleeAttack.Attack(player.Controller.Direction);
-		player.Controller.MoveDown(true);
+		player.MeleeAttack.Attack(player.Movement.Direction);
+		player.Movement.MoveDown(true);
 
 		// Waits 0.1 seconds and checks the position is still the same.
 		yield return new WaitForSeconds(0.1f);

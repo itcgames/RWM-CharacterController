@@ -18,31 +18,37 @@ public class CustomisableBehavioursTests
     // A test class to be used in SlottingInNewBehaviours().
     private class TestBehaviour : CharacterBehaviour
     {
-        public void Update() => Controller.MoveRight();
+        new void Start() 
+        {
+            base.Start();
+            
+            // Disables the behaviour if Movement is null.
+            if (!Movement) enabled = false; 
+        }
+
+        void Update() => Movement.MoveRight();
     }
 
 
     [UnityTest]
     public IEnumerator SlottingInNewBehaviours()
     { 
-        TopdownCharacterController character = TestUtilities.GetDefaultCharacter();
-        Assert.NotNull(character);
+        CharacterBehaviour behaviour = TestUtilities.GetDefaultCharactersBehaviour();
+        GameObject character = behaviour.gameObject;
 
         // Removes the character's default behaviour.
-        Object.Destroy(character.GetComponent<CharacterBehaviour>());
+        Object.Destroy(behaviour);
 
         // Sets the test character behaviour.
-        character.gameObject.AddComponent<TestBehaviour>();
+        character.AddComponent<TestBehaviour>();
 
         yield return new WaitForSeconds(0.1f);
 
         // Gets the character's behaviour.
-        CharacterBehaviour behaviour = 
-            character.gameObject.GetComponent<CharacterBehaviour>();
+        behaviour = character.GetComponent<CharacterBehaviour>();
 
-        // Checks the behaviour was set correctly on both objects.
+        // Checks the behaviour was set correctly.
         Assert.IsTrue(behaviour is TestBehaviour);
-        Assert.AreSame(character, behaviour.Controller);
 
         // Checks that the character has been moving to the right without
         //      keyboard input.
@@ -54,12 +60,8 @@ public class CustomisableBehavioursTests
     [UnityTest]
     public IEnumerator DefaultBehaviourIsUserInput()
     {
-        TopdownCharacterController character = TestUtilities.GetDefaultCharacter();
-        Assert.NotNull(character);
-
-        // Get's the character's default behaviour.
-        CharacterBehaviour behaviour =
-            character.GetComponent<CharacterBehaviour>();
+        // Get's the default character's default behaviour.
+        CharacterBehaviour behaviour = TestUtilities.GetDefaultCharactersBehaviour();
 
         // Checks the behaviour is a user input behaviour by default.
         Assert.IsTrue(behaviour is UserInputBehaviour);

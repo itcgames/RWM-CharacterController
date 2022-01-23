@@ -17,7 +17,7 @@ public class MovementTests
     [UnityTest]
     public IEnumerator HorizontalMovement()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        Movement player = GetDefaultCharactersMovement();
 
         // Rightward movement.
         Vector3 position = player.transform.position;
@@ -36,7 +36,7 @@ public class MovementTests
     [UnityTest]
     public IEnumerator VerticalMovement()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        Movement player = GetDefaultCharactersMovement();
 
         // Upwards movement.
         Vector3 position = player.transform.position;
@@ -55,7 +55,8 @@ public class MovementTests
     [UnityTest]
     public IEnumerator DiagonalMovement()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        TopdownMovement player = GetDefaultCharactersTopdownMovement();
+
         player.DiagonalMovementAllowed = true;
 
         // Up + right movement.
@@ -79,7 +80,7 @@ public class MovementTests
     [UnityTest]
     public IEnumerator NoMovementOnOppositeInput()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        Movement player = GetDefaultCharactersMovement();
 
         // Vertical movement.
         Vector3 position = player.transform.position;
@@ -103,7 +104,7 @@ public class MovementTests
     [UnityTest]
     public IEnumerator NoDiagonalMovementWhenDisabled()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         // Giving these properties the following values, the character should
         //      only move horizontally when moving vertically and horizontally.
@@ -133,13 +134,16 @@ public class MovementTests
     [UnityTest]
     public IEnumerator TilebasedMovement()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        // Loads a different scene.
+        SceneManager.LoadScene(TestUtilities.TILEBASED_SCENE_NAME);
+        yield return null;
+
+        TilebasedMovement player = GetDefaultCharactersTilebasedMovement();
 
         // A small buffer to allow for timing based issues in the test.
         const float TimeErrorBuffer = 0.1f;
 
         // Sets up the character for tile based movement.
-        player.TilebasedMovement = true;
         player.SecondsPerTile = 0.75f;
         player.TileSize = 1.0f;
 
@@ -165,7 +169,7 @@ public class MovementTests
     [UnityTest]
     public IEnumerator Acceleration()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         player.TimeToMaxSpeed = 0.5f;
 
@@ -180,7 +184,7 @@ public class MovementTests
     [UnityTest]
     public IEnumerator Deceleration()
     {
-        var player = TestUtilities.GetDefaultCharacter();
+        TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         player.TimeToFullStop = 0.5f;
 
@@ -194,5 +198,26 @@ public class MovementTests
 
         yield return new WaitForSeconds(player.TimeToFullStop / 2.0f);
         Assert.AreEqual(0.0f, player.GetSpeed());
+    }
+
+    private Movement GetDefaultCharactersMovement()
+    {
+        CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+        Assert.NotNull(player.Movement);
+        return player.Movement;
+    }
+
+    private TopdownMovement GetDefaultCharactersTopdownMovement()
+    {
+        CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+        Assert.NotNull(player.TopdownMovement);
+        return player.TopdownMovement;
+    }
+
+    private TilebasedMovement GetDefaultCharactersTilebasedMovement()
+    {
+        CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+        Assert.NotNull(player.TilebasedMovement);
+        return player.TilebasedMovement;
     }
 }

@@ -6,6 +6,7 @@ public class MeleeAttack : MonoBehaviour
 {
 	// ==== Properties ====
 
+	public bool HandleAnimationEvents = true;
 	public float AttackDamage = 1.0f;
 	public float AttackRadius = 0.5f;
 
@@ -16,7 +17,6 @@ public class MeleeAttack : MonoBehaviour
 
 	public float ThornsDamage = 0.0f;
 	public bool FreezeOnAttack = false;
-	public bool HandleAnimationEvents = true;
 
 	// ==== Private Variables ====
 

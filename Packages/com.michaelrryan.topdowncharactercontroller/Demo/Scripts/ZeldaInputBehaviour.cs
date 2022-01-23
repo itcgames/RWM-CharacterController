@@ -10,26 +10,32 @@ public class ZeldaInputBehaviour : CharacterBehaviour
     {
         base.Start();
 
-        if (Health) Health.HP = _maxHealth;
-        Controller.PreferHorizontal = true;
+        // Disables the behaviour if the required components are null.
+        if (!Movement || !MeleeAttack || !RangedAttack || !Health)
+            enabled = false;
+        else
+        {
+            Health.HP = _maxHealth;
+            Movement.PreferHorizontal = true;
+        }
     }
 
     void Update()
     {
         // Horizontal Input.
-        if (Input.GetKey(KeyCode.LeftArrow)) Controller.MoveLeft();
-        if (Input.GetKey(KeyCode.RightArrow)) Controller.MoveRight();
+        if (Input.GetKey(KeyCode.LeftArrow)) Movement.MoveLeft();
+        if (Input.GetKey(KeyCode.RightArrow)) Movement.MoveRight();
 
         // Vertical Input.
-        if (Input.GetKey(KeyCode.UpArrow)) Controller.MoveUp();
-        if (Input.GetKey(KeyCode.DownArrow)) Controller.MoveDown();
+        if (Input.GetKey(KeyCode.UpArrow)) Movement.MoveUp();
+        if (Input.GetKey(KeyCode.DownArrow)) Movement.MoveDown();
 
         if (Input.GetKey(KeyCode.C))
         {
             if (Health && Health.HP == _maxHealth)
-                RangedAttack.Fire(Controller.Direction);
+                RangedAttack.Fire(Movement.Direction);
 
-            if (MeleeAttack) MeleeAttack.Attack(Controller.Direction);
+            if (MeleeAttack) MeleeAttack.Attack(Movement.Direction);
         }
     }
 }

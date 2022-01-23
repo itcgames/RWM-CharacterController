@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1590756327094295977}
-  - component: {fileID: 4449338863367465953}
+  - component: {fileID: 9172450549431882045}
   - component: {fileID: 4710276032706675751}
   - component: {fileID: 2508253132367048024}
   - component: {fileID: 5718288718091086199}
@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 6562751645543972121}
   - component: {fileID: 6108527119500981576}
   m_Layer: 0
-  m_Name: TopdownCharacter
+  m_Name: TilebasedCharacter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39,7 +39,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4449338863367465953
+--- !u!114 &9172450549431882045
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -48,16 +48,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1590756327094295973}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f557ed19680a9341b7de6d65a90e011, type: 3}
+  m_Script: {fileID: 11500000, guid: f4560b6847c39e744b7fe95f31cb660e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   HandleAnimationEvents: 1
   Direction: {x: 0, y: -1}
   PreferHorizontal: 0
-  _diagonalMovementAllowed: 1
-  MaxSpeed: 5
-  _timeToMaxSpeed: 0
-  _timeToFullStop: 0
+  TileSize: 1
+  SecondsPerTile: 0.25
 --- !u!114 &4710276032706675751
 MonoBehaviour:
   m_ObjectHideFlags: 0

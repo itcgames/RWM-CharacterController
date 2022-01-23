@@ -193,9 +193,8 @@ public class HealthTests
 
 	private Health GetDefaultCharacterHealth()
 	{
-		var character = TestUtilities.GetDefaultCharacter();
-		Health health = character.GetComponent<Health>();
-		Assert.NotNull(health);
-		return health;
+		CharacterBehaviour character = TestUtilities.GetDefaultCharactersBehaviour();
+		Assert.NotNull(character.Health);
+		return character.Health;
 	}
 }

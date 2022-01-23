@@ -68,10 +68,9 @@ public class RangedAttackTests
 	{
 		const float PROJECTILE_DISTANCE = 5.0f;
 
-		// Gets the enemy character.
-		var enemy = TestUtilities.GetCharacterByName(NPC_NAME);
-		Health enemyHealth = enemy.GetComponent<Health>();
-		Assert.NotNull(enemyHealth);
+		// Gets the enemy character's behaviour.
+		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+		Assert.NotNull(enemy.Health);
 
 		// Gets the player's ranged attack component and checks it's not null.
 		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
@@ -86,12 +85,12 @@ public class RangedAttackTests
 		Projectile projectile = projectileObj.GetComponent<Projectile>();
 
 		// Gets the enemies health and waits for the bullet to hit.
-		float enemyHP = enemyHealth.HP;
+		float enemyHP = enemy.Health.HP;
 		yield return new WaitForSeconds((PROJECTILE_DISTANCE / projectile.Speed)
 			+ SAFETY_MARGIN);
 
 		// Checks that the enemy took damage and the projectile no longer exists.
-		Assert.AreEqual(enemyHP - projectile.Damage, enemyHealth.HP);
+		Assert.AreEqual(enemyHP - projectile.Damage, enemy.Health.HP);
 		Assert.IsNull(GameObject.Find(PROJECTILE_NAME));
 	}
 
@@ -163,10 +162,10 @@ public class RangedAttackTests
 	private RangedAttack GetDefaultRangedAttackComponent()
 	{
 		// Gets the player character.
-		TopdownCharacterController player =
-			TestUtilities.GetDefaultCharacter();
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
 
 		// Gets and returns the ranged attack component.
-		return player.GetComponent<RangedAttack>();
+		return player.RangedAttack;
 	}
 }
