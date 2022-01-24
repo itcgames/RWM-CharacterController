@@ -64,7 +64,7 @@ public class AnimationTests
 
 		// Moves the player to the left.
 		player.Movement.MoveLeft();
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(IDLE_LEFT, TestUtilities.GetCurrentClipName(animator));
 	}
 
@@ -78,7 +78,7 @@ public class AnimationTests
 		Assert.NotNull(player.Movement);
 
 		player.Movement.MoveRight();
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(IDLE_RIGHT, TestUtilities.GetCurrentClipName(animator));
 	}
 
@@ -92,7 +92,7 @@ public class AnimationTests
 		Assert.NotNull(player.Movement);
 
 		player.Movement.MoveUp();
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(IDLE_UP, TestUtilities.GetCurrentClipName(animator));
 	}
 
@@ -114,7 +114,7 @@ public class AnimationTests
 
 		// Moves the player down and waits.
 		player.Movement.MoveDown();
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(IDLE_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 
@@ -258,31 +258,37 @@ public class AnimationTests
 	public IEnumerator CustomAnimationsFunctionCorrectly()
 	{
 		var enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_CHARACTER);
+		Assert.NotNull(enemy.Movement);
+
+		// Disables the enemy behaviour to stop it moving.
+		enemy.enabled = false;
+		enemy.Movement.ClearPersistentInput();
+
 		Animator animator = enemy.GetComponent<Animator>();
 		Assert.NotNull(animator);
 		Assert.NotNull(enemy.Movement);
 
 		// Checks left movement.
 		enemy.Movement.MoveLeft(true);
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(ENEMY_MOVING_LEFT, TestUtilities.GetCurrentClipName(animator));
 
 		// Checks right movement.
 		enemy.Movement.ClearPersistentInput();
 		enemy.Movement.MoveRight(true);
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(ENEMY_MOVING_RIGHT, TestUtilities.GetCurrentClipName(animator));
 
 		// Checks upward movement.
 		enemy.Movement.ClearPersistentInput();
 		enemy.Movement.MoveUp(true);
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(ENEMY_MOVING_UP, TestUtilities.GetCurrentClipName(animator));
 
 		// Checks downward movement.
 		enemy.Movement.ClearPersistentInput();
 		enemy.Movement.MoveDown(true);
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.2f);
 		Assert.AreEqual(ENEMY_MOVING_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 }

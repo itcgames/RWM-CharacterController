@@ -8,7 +8,6 @@ using TopdownCharacterController;
 
 public class RangedAttackTests
 {
-	const string PROJECTILE_NAME = "BasicProjectile(Clone)";
 	const string NPC_NAME = "Enemy";
 
 	// How much extra time to add when waiting for a specific length of time
@@ -38,7 +37,7 @@ public class RangedAttackTests
 		yield return null;
 
 		// Ensures the projectile exists and matches the projectile returned.
-		GameObject projectile = GameObject.Find(PROJECTILE_NAME);
+		GameObject projectile = GameObject.Find(TestUtilities.PROJECTILE_NAME);
 		Assert.NotNull(projectile);
 		Assert.AreSame(fired, projectile);
 	}
@@ -92,7 +91,7 @@ public class RangedAttackTests
 
 		// Checks that the enemy took damage and the projectile no longer exists.
 		Assert.AreEqual(enemyHP - projectile.Damage, enemy.Health.HP);
-		Assert.IsNull(GameObject.Find(PROJECTILE_NAME));
+		Assert.IsNull(GameObject.Find(TestUtilities.PROJECTILE_NAME));
 	}
 
 	[UnityTest]
@@ -116,12 +115,12 @@ public class RangedAttackTests
 
 		// Fires a projectile and ensures it's not null.
 		rangedAttack.Fire(Vector2.left);
-		GameObject fired = GameObject.Find(PROJECTILE_NAME);
+		GameObject fired = GameObject.Find(TestUtilities.PROJECTILE_NAME);
 		Assert.NotNull(fired);
 
 		// Waits for the projectile to expire and ensures it's now null.
 		yield return new WaitForSeconds(PROJECTILE_EXPIRE_TIME + SAFETY_MARGIN);
-		fired = GameObject.Find(PROJECTILE_NAME);
+		fired = GameObject.Find(TestUtilities.PROJECTILE_NAME);
 		Assert.Null(fired);
 
 		// Sets the expire time back to what it was as Unity does not do this

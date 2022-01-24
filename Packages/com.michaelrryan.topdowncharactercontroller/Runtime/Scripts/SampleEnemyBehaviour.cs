@@ -8,8 +8,8 @@ namespace TopdownCharacterController
 	{
 		public GameObject projectile;
 
-		private const float ACTION_INTERVAL = 1.0f;
-		private const float MAX_FIRE_INTERVAL = 10.0f;
+		public const float ACTION_INTERVAL = 1.0f;
+		public const float MAX_FIRE_INTERVAL = 10.0f;
 
 		private float _lastActionTime;
 		private float _lastFireTime;

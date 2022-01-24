@@ -65,6 +65,12 @@ public class CollisionTests
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_NAME);
 		Assert.NotNull(player.TopdownMovement);
+		Assert.NotNull(enemy.Movement);
+
+		// Disables the enemy behaviour to stop it moving.
+		enemy.enabled = false;
+		enemy.Movement.ClearPersistentInput();
+		yield return new WaitForSeconds(0.1f);
 
 		// Positions the player by the enemy and sets its properties.
 		player.transform.position = enemy.transform.position + Vector3.right;

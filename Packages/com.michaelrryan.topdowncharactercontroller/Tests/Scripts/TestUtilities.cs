@@ -9,7 +9,7 @@ public class TestUtilities
 	public const string DEFAULT_CHARACTER_NAME = "Player";
 	public const string DEFAULT_SCENE_NAME = "ZeldaDemoScene";
 	public const string TILEBASED_SCENE_NAME = "ZeldaTilebasedDemoScene";
-
+	public const string PROJECTILE_NAME = "BasicProjectile(Clone)";
 
 	public static CharacterBehaviour GetBehaviourByCharacterName(string name)
     {
