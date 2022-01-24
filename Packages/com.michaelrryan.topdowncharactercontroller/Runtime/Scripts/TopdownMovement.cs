@@ -63,9 +63,6 @@ namespace TopdownCharacterController
 			SetTimeToFullStop(_timeToFullStop);
 
 			base.Start();
-
-			// Ensures the rigidbody is set up correctly.
-			if (_rigidbody) _rigidbody.isKinematic = false;
 		}
 
 		void Update()

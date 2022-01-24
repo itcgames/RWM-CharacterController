@@ -34,9 +34,6 @@ namespace TopdownCharacterController
 			DiagonalMovement = false;
 
 			base.Start();
-
-			// Ensures the rigidbody is set up correctly.
-			if (_rigidbody) _rigidbody.isKinematic = true;
 		}
 
 		void Update()

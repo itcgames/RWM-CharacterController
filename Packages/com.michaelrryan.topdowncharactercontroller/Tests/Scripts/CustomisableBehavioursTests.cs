@@ -35,7 +35,10 @@ public class CustomisableBehavioursTests
 
     [UnityTest]
     public IEnumerator SlottingInNewBehaviours()
-    { 
+    {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         CharacterBehaviour behaviour = TestUtilities.GetDefaultCharactersBehaviour();
         GameObject character = behaviour.gameObject;
 

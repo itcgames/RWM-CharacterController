@@ -23,6 +23,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator ProjectileFires()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player's ranged attack component and checks it's not null.
 		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
@@ -45,6 +48,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator CannotFireDuringCooldown()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player's ranged attack component and checks it's not null.
 		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
@@ -66,7 +72,10 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator DefaultProjectileCausesDamages()
 	{
-		const float PROJECTILE_DISTANCE = 5.0f;
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		const float PROJECTILE_DISTANCE = 2.0f;
 
 		// Gets the enemy character's behaviour.
 		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
@@ -97,6 +106,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator ProjectileIsDestroyedAfterDelay()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		const float PROJECTILE_EXPIRE_TIME = 0.1f;
 
 		// Gets the player's ranged attack component and checks it's not null.
@@ -131,6 +143,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator LimitedAmmoWorksAsExpected()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		const int AMMO = 3;
 		const float COOLDOWN = 0.1f;
 

@@ -42,6 +42,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CorrectDefaultAnimation()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -56,6 +59,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterFacesLeft()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -71,6 +77,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterFacesRight()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -85,6 +94,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterFacesUp()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -99,6 +111,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterFacesDown()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// The default animation is facing downwards, so we change the
 		//		animation first.
 		// This test assumes the CharacterFacesUp test passed.
@@ -121,6 +136,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesLeft()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -135,6 +153,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesRight()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -149,6 +170,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesUp()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -163,6 +187,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesDown()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player and its animator.
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
@@ -177,6 +204,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator MeleeAttackLeftAnimates()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
 		Assert.NotNull(animator);
@@ -193,6 +223,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator MeleeAttackRightAnimates()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
 		Assert.NotNull(animator);
@@ -209,6 +242,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator MeleeAttackUpwardAnimates()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
 		Assert.NotNull(animator);
@@ -225,6 +261,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator MeleeAttackDownwardAnimates()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
 		Assert.NotNull(animator);
@@ -241,6 +280,9 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator ReturnsToIdleAfterMelee()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Animator animator = player.GetComponent<Animator>();
 		Assert.NotNull(animator);
@@ -257,12 +299,10 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CustomAnimationsFunctionCorrectly()
 	{
-		var enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_CHARACTER);
-		Assert.NotNull(enemy.Movement);
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
 
-		// Disables the enemy behaviour to stop it moving.
-		enemy.enabled = false;
-		enemy.Movement.ClearPersistentInput();
+		var enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_CHARACTER);
 
 		Animator animator = enemy.GetComponent<Animator>();
 		Assert.NotNull(animator);
