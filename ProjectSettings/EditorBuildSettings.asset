@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Packages/com.michaelrryan.topdowncharactercontroller/Tests/Scenes/BehaviourTestScene.unity
     guid: 81b3809b10c02cd438487a9f8899773d
+  - enabled: 1
+    path: Packages/com.michaelrryan.topdowncharactercontroller/Demo/Scenes/ZeldaTilebasedDemoScene.unity
+    guid: eef2b403ab0856a49b5880630f053000
   m_configObjects: {}

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using TopdownCharacterController;
 
 public class AnimationTests
 {
@@ -41,10 +42,16 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CorrectDefaultAnimation()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
 
 		// Checks the default animation is correct.
-		Assert.AreEqual(DEFAULT_ANIMATION, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(DEFAULT_ANIMATION, TestUtilities.GetCurrentClipName(animator));
 
 		yield return null;
 	}
@@ -52,287 +59,276 @@ public class AnimationTests
 	[UnityTest]
 	public IEnumerator CharacterFacesLeft()
 	{
-		// Gets the player and moves it to the left.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveLeft();
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(IDLE_LEFT, GetCurrentClipName(player.Animator));
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		// Moves the player to the left.
+		player.Movement.MoveLeft();
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(IDLE_LEFT, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterFacesRight()
 	{
-		// Gets the player and moves it to the right.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveRight();
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(IDLE_RIGHT, GetCurrentClipName(player.Animator));
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		player.Movement.MoveRight();
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(IDLE_RIGHT, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterFacesUp()
 	{
-		// Gets the player and moves it upwards.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveUp();
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(IDLE_UP, GetCurrentClipName(player.Animator));
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		player.Movement.MoveUp();
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(IDLE_UP, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterFacesDown()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// The default animation is facing downwards, so we change the
 		//		animation first.
 		// This test assumes the CharacterFacesUp test passed.
 
-		// Gets the player and moves it upwards.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveUp();
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		player.Movement.MoveUp();
 		yield return null;
 
 		// Moves the player down and waits.
-		player.MoveDown();
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
-	}
-
-	[UnityTest]
-	public IEnumerator TilebasedCharacterFacesLeft()
-	{
-		// Gets the player and moves it to the left.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.SecondsPerTile = 0.1f;
-
-		player.MoveLeft();
+		player.Movement.MoveDown();
 		yield return new WaitForSeconds(0.2f);
-		Assert.AreEqual(IDLE_LEFT, GetCurrentClipName(player.Animator));
-	}
-
-	[UnityTest]
-	public IEnumerator TilebasedCharacterFacesRight()
-	{
-		// Gets the player and moves it to the right.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.SecondsPerTile = 0.1f;
-
-		player.MoveRight();
-		yield return new WaitForSeconds(0.2f);
-		Assert.AreEqual(IDLE_RIGHT, GetCurrentClipName(player.Animator));
-	}
-
-	[UnityTest]
-	public IEnumerator TilebasedCharacterFacesUp()
-	{
-		// Gets the player and moves it upwards.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.SecondsPerTile = 0.1f;
-
-		player.MoveUp();
-		yield return new WaitForSeconds(0.2f);
-		Assert.AreEqual(IDLE_UP, GetCurrentClipName(player.Animator));
-	}
-
-	[UnityTest]
-	public IEnumerator TilebasedCharacterFacesDown()
-	{
-		// The default animation is facing downwards, so we change the
-		//		animation first.
-		// This test assumes the CharacterFacesUp test passed.
-
-		// Gets the player and moves it upwards.
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.SecondsPerTile = 0.1f;
-
-		player.MoveUp();
-		yield return new WaitForSeconds(0.2f);
-
-		// Moves the player down and waits.
-		player.MoveDown();
-		yield return new WaitForSeconds(0.2f);
-		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(IDLE_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesLeft()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveLeft(true);
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		player.Movement.MoveLeft(true);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_LEFT, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(MOVING_LEFT, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesRight()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveRight(true);
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		player.Movement.MoveRight(true);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_RIGHT, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(MOVING_RIGHT, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesUp()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveUp(true);
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
+
+		player.Movement.MoveUp(true);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_UP, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(MOVING_UP, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CharacterMovementAnimatesDown()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.MoveDown(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_DOWN, GetCurrentClipName(player.Animator));
-	}
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
 
-	[UnityTest]
-	public IEnumerator TilebasedCharacterMovementAnimatesLeft()
-	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.MoveLeft(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_LEFT, GetCurrentClipName(player.Animator));
-	}
+		// Gets the player and its animator.
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.Movement);
 
-	[UnityTest]
-	public IEnumerator TilebasedCharacterMovementAnimatesRight()
-	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.MoveRight(true);
+		player.Movement.MoveDown(true);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_RIGHT, GetCurrentClipName(player.Animator));
-	}
-
-	[UnityTest]
-	public IEnumerator TilebasedCharacterMovementAnimatesUp()
-	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.MoveUp(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_UP, GetCurrentClipName(player.Animator));
-	}
-
-	[UnityTest]
-	public IEnumerator TilebasedCharacterMovementAnimatesDown()
-	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.MoveDown(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(MOVING_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(MOVING_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackLeftAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveLeft();
-		player.Attack();
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Movement.MoveLeft();
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_LEFT, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_LEFT, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackRightAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveRight();
-		player.Attack();
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Movement.MoveRight();
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_RIGHT, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_RIGHT, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackUpwardAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveUp();
-		player.Attack();
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Movement.MoveUp();
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_UP, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_UP, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator MeleeAttackDownwardAnimates()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 1.0f;
-		player.MoveDown();
-		player.Attack();
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Animator));
-	}
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
 
-	[UnityTest]
-	public IEnumerator TilebasedMeleeAttackAnimates()
-	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.TilebasedMovement = true;
-		player.AttackCooldown = 1.0f;
-		player.MoveDown();
-		player.Attack();
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 1.0f;
+
+		player.Movement.MoveDown();
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ATTACK_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(ATTACK_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator ReturnsToIdleAfterMelee()
 	{
-		var player = TestUtilities.GetDefaultCharacter();
-		player.AttackCooldown = 0.1f;
-		player.MoveDown();
-		player.Attack();
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
+		Animator animator = player.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(player.MeleeAttack);
+
+		player.MeleeAttack.AttackCooldown = 0.1f;
+
+		player.Movement.MoveDown();
+		player.MeleeAttack.Attack(player.Movement.Direction);
 		yield return new WaitForSeconds(0.2f);
-		Assert.AreEqual(IDLE_DOWN, GetCurrentClipName(player.Animator));
+		Assert.AreEqual(IDLE_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 
 	[UnityTest]
 	public IEnumerator CustomAnimationsFunctionCorrectly()
 	{
-		var enemy = TestUtilities.GetCharacterByName(ENEMY_CHARACTER);
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		var enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_CHARACTER);
+
+		Animator animator = enemy.GetComponent<Animator>();
+		Assert.NotNull(animator);
+		Assert.NotNull(enemy.Movement);
 
 		// Checks left movement.
-		enemy.MoveLeft(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ENEMY_MOVING_LEFT, GetCurrentClipName(enemy.Animator));
+		enemy.Movement.MoveLeft(true);
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(ENEMY_MOVING_LEFT, TestUtilities.GetCurrentClipName(animator));
 
 		// Checks right movement.
-		enemy.ClearPersistentInput();
-		enemy.MoveRight(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ENEMY_MOVING_RIGHT, GetCurrentClipName(enemy.Animator));
+		enemy.Movement.ClearPersistentInput();
+		enemy.Movement.MoveRight(true);
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(ENEMY_MOVING_RIGHT, TestUtilities.GetCurrentClipName(animator));
 
 		// Checks upward movement.
-		enemy.ClearPersistentInput();
-		enemy.MoveUp(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ENEMY_MOVING_UP, GetCurrentClipName(enemy.Animator));
+		enemy.Movement.ClearPersistentInput();
+		enemy.Movement.MoveUp(true);
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(ENEMY_MOVING_UP, TestUtilities.GetCurrentClipName(animator));
 
 		// Checks downward movement.
-		enemy.ClearPersistentInput();
-		enemy.MoveDown(true);
-		yield return new WaitForSeconds(0.1f);
-		Assert.AreEqual(ENEMY_MOVING_DOWN, GetCurrentClipName(enemy.Animator));
-	}
-
-	private string GetCurrentClipName(Animator animator)
-    {
-		var info = animator.GetCurrentAnimatorClipInfo(0);
-		Assert.IsNotEmpty(info);
-		return info[0].clip.name;
+		enemy.Movement.ClearPersistentInput();
+		enemy.Movement.MoveDown(true);
+		yield return new WaitForSeconds(0.2f);
+		Assert.AreEqual(ENEMY_MOVING_DOWN, TestUtilities.GetCurrentClipName(animator));
 	}
 }
