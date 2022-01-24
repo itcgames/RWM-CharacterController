@@ -19,6 +19,9 @@ public class MeleeAttackTests
 	[UnityTest]
 	public IEnumerator AttackDamagesCharactersInARadius()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		const float ATTACK_RADIUS = 1.0f;
 		const float ATTACK_DAMAGE = 1.0f;
 		const float ENEMY_HEALTH = 2.0f;
@@ -59,6 +62,9 @@ public class MeleeAttackTests
 	[UnityTest]
 	public IEnumerator CannotAttackDuringCooldown()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// SETS UP THE CHARACTERS.
 		const float ATTACK_RADIUS = 1.0f;
 		const float ATTACK_DAMAGE = 1.0f;
@@ -123,6 +129,9 @@ public class MeleeAttackTests
 	[UnityTest]
 	public IEnumerator CollidingCharactersTakeThornsDamage()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// SETS UP THE CHARACTERS.
 		const float HEALTH = 2.0f;
 		const float DAMAGE_GRACE_PERIOD = 0.2f;
@@ -157,6 +166,9 @@ public class MeleeAttackTests
 	[UnityTest]
 	public IEnumerator CharacterFreezesOnAttack()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets and sets up the character.
 		const float ATTACK_COOLDOWN = 0.25f;
 

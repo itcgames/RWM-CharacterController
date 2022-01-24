@@ -25,6 +25,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator CharacterDiesOnZeroHealth()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Damages the character equal to its health, waits a frame and
 		//      checks they are now null.
 		Health health = GetDefaultCharacterHealth();
@@ -36,6 +39,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator NoDamageTakenDuringGracePeriod()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		Health health = GetDefaultCharacterHealth();
 
 		// Stashes these to avoid interfering with the wait time.
@@ -58,6 +64,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator DamageCanBeDoneAfterGracePeriod()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// An added margin to avoid floating point errors.
 		const float ERROR_MARGIN = 0.05f;
 
@@ -78,6 +87,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator FlashesDuringGracePeriod()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// An added margin to avoid floating point errors.
 		const float ERROR_MARGIN = 0.05f;
 
@@ -112,6 +124,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator IsVisibleAfterGracePeriod()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the character's health and renderer components.
 		Health health = GetDefaultCharacterHealth();
 		Renderer renderer = health.GetComponent<Renderer>();
@@ -126,6 +141,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator WhitelistedTagsCanDamage()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the character's health component and whitelists the "Enemy" tag.
 		Health health = GetDefaultCharacterHealth();
 		health.DamageWhitelistTags.Add("Enemy");
@@ -144,6 +162,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator NonWhitelistedTagsCannotDamage()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the character's health component and whitelists the "Enemy" tag.
 		Health health = GetDefaultCharacterHealth();
 		health.DamageWhitelistTags.Add("Enemy");
@@ -162,6 +183,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator AllWhitelistTagAllowsAnyTag()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the character's health component and whitelists the "All" tag.
 		Health health = GetDefaultCharacterHealth();
 		health.DamageWhitelistTags.Add("All");
@@ -180,6 +204,9 @@ public class HealthTests
 	[UnityTest]
 	public IEnumerator DeathCallbacksAreRunOnDeath()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the character's health component, adds the callback and
 		//		initialises the checker variable.
 		Health health = GetDefaultCharacterHealth();

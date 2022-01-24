@@ -18,6 +18,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator HorizontalMovement()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         Movement player = GetDefaultCharactersMovement();
 
         // Rightward movement.
@@ -37,6 +40,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator VerticalMovement()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         Movement player = GetDefaultCharactersMovement();
 
         // Upwards movement.
@@ -56,6 +62,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator DiagonalMovement()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         player.DiagonalMovementAllowed = true;
@@ -81,6 +90,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator NoMovementOnOppositeInput()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         Movement player = GetDefaultCharactersMovement();
 
         // Vertical movement.
@@ -105,6 +117,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator NoDiagonalMovementWhenDisabled()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         // Giving these properties the following values, the character should
@@ -170,6 +185,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator Acceleration()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         player.TimeToMaxSpeed = 0.5f;
@@ -185,6 +203,9 @@ public class MovementTests
     [UnityTest]
     public IEnumerator Deceleration()
     {
+        // Disables the enemy to prevent unwanted behaviour.
+        TestUtilities.DisableEnemy();
+
         TopdownMovement player = GetDefaultCharactersTopdownMovement();
 
         player.TimeToFullStop = 0.5f;

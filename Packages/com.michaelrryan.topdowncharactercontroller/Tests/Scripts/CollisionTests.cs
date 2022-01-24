@@ -21,6 +21,9 @@ public class CollisionTests
 		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
 		yield return null;
 
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		Assert.NotNull(player.TopdownMovement);
 
@@ -40,6 +43,9 @@ public class CollisionTests
 	{
 		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
 		yield return null;
+
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
 
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_NAME);
@@ -61,6 +67,9 @@ public class CollisionTests
 	{
 		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
 		yield return null;
+
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
 
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(ENEMY_NAME);
@@ -85,6 +94,9 @@ public class CollisionTests
 	{
 		SceneManager.LoadScene(TestUtilities.GetDefaultSceneName());
 		yield return null;
+
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
 
 		CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
 		RangedAttack ranged = player.GetComponent<RangedAttack>();

@@ -8,7 +8,6 @@ using TopdownCharacterController;
 
 public class RangedAttackTests
 {
-	const string PROJECTILE_NAME = "BasicProjectile(Clone)";
 	const string NPC_NAME = "Enemy";
 
 	// How much extra time to add when waiting for a specific length of time
@@ -24,6 +23,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator ProjectileFires()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player's ranged attack component and checks it's not null.
 		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
@@ -38,7 +40,7 @@ public class RangedAttackTests
 		yield return null;
 
 		// Ensures the projectile exists and matches the projectile returned.
-		GameObject projectile = GameObject.Find(PROJECTILE_NAME);
+		GameObject projectile = GameObject.Find(TestUtilities.PROJECTILE_NAME);
 		Assert.NotNull(projectile);
 		Assert.AreSame(fired, projectile);
 	}
@@ -46,6 +48,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator CannotFireDuringCooldown()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		// Gets the player's ranged attack component and checks it's not null.
 		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
 		Assert.NotNull(rangedAttack);
@@ -67,7 +72,10 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator DefaultProjectileCausesDamages()
 	{
-		const float PROJECTILE_DISTANCE = 5.0f;
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		const float PROJECTILE_DISTANCE = 2.0f;
 
 		// Gets the enemy character's behaviour.
 		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
@@ -92,12 +100,15 @@ public class RangedAttackTests
 
 		// Checks that the enemy took damage and the projectile no longer exists.
 		Assert.AreEqual(enemyHP - projectile.Damage, enemy.Health.HP);
-		Assert.IsNull(GameObject.Find(PROJECTILE_NAME));
+		Assert.IsNull(GameObject.Find(TestUtilities.PROJECTILE_NAME));
 	}
 
 	[UnityTest]
 	public IEnumerator ProjectileIsDestroyedAfterDelay()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		const float PROJECTILE_EXPIRE_TIME = 0.1f;
 
 		// Gets the player's ranged attack component and checks it's not null.
@@ -116,12 +127,12 @@ public class RangedAttackTests
 
 		// Fires a projectile and ensures it's not null.
 		rangedAttack.Fire(Vector2.left);
-		GameObject fired = GameObject.Find(PROJECTILE_NAME);
+		GameObject fired = GameObject.Find(TestUtilities.PROJECTILE_NAME);
 		Assert.NotNull(fired);
 
 		// Waits for the projectile to expire and ensures it's now null.
 		yield return new WaitForSeconds(PROJECTILE_EXPIRE_TIME + SAFETY_MARGIN);
-		fired = GameObject.Find(PROJECTILE_NAME);
+		fired = GameObject.Find(TestUtilities.PROJECTILE_NAME);
 		Assert.Null(fired);
 
 		// Sets the expire time back to what it was as Unity does not do this
@@ -132,6 +143,9 @@ public class RangedAttackTests
 	[UnityTest]
 	public IEnumerator LimitedAmmoWorksAsExpected()
 	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
 		const int AMMO = 3;
 		const float COOLDOWN = 0.1f;
 
