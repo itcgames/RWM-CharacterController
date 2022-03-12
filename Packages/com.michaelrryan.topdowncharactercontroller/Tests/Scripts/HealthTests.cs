@@ -10,10 +10,16 @@ public class HealthTests
 {
 	// Variable and method used in DeathCallbacksAreRunOnDeath().
 	private bool _deathCallbackRun = false;
+	private Dictionary<string, string> _damageInfo = null;
 
-	void DeathCallback()
+	void DeathCallback(Dictionary<string, string> damageInfo)
 	{
 		_deathCallbackRun = true;
+	}
+
+	void DeathCallbackWithInfo(Dictionary<string, string> damageInfo)
+	{
+		_damageInfo = damageInfo;
 	}
 
 	[SetUp]
@@ -217,6 +223,33 @@ public class HealthTests
 		health.TakeDamage(health.HP);
 		yield return null;
 		Assert.IsTrue(_deathCallbackRun);
+	}
+
+	[UnityTest]
+	public IEnumerator DeathCallbacksPassDamageInfo()
+	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Asserts the info is null at first.
+		Assert.Null(_damageInfo);
+
+		// Gets the character's health component, adds the callback and
+		//		initialises the checker variable.
+		Health health = GetDefaultCharacterHealth();
+		health.DeathCallbacks.Add(DeathCallbackWithInfo);
+
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+        // Kills the character and checks the callback was run next frame.
+        health.TakeDamage(health.HP, null, attackInfo);
+		yield return null;
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
 	}
 
 	private Health GetDefaultCharacterHealth()
