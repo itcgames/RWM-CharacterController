@@ -24,6 +24,9 @@ namespace TopdownCharacterController
 		public delegate void DeathCallback(Dictionary<string, string> damageInfo);
 		public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
 
+		public delegate void HealthChangedCallback (Dictionary<string, string> changeInfo);
+		public List<HealthChangedCallback> HealthChangedCallbacks = new List<HealthChangedCallback>();
+
 		// ==== Private Variables ====
 
 		private const string ALL_TAG = "All";
