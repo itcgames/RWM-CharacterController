@@ -21,7 +21,7 @@ namespace TopdownCharacterController
 		public int GracePeriodFlashes = 4;
 		public List<string> DamageWhitelistTags = new List<string>();
 
-		public delegate void DeathCallback();
+		public delegate void DeathCallback(Dictionary<string, string> damageInfo);
 		public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
 
 		// ==== Private Variables ====
@@ -33,7 +33,7 @@ namespace TopdownCharacterController
 
 		// ==== Public Custom Methods ====
 
-		public bool TakeDamage(float damage, string attackersTag = null)
+		public bool TakeDamage(float damage, string attackersTag = null, Dictionary<string, string> damageInfo = null)
 		{
 			// Checks the grace period has elapsed.
 			if (Time.time >= _lastHitTaken + _damageGracePeriod)
@@ -51,7 +51,9 @@ namespace TopdownCharacterController
 					// Checks if health has reached zero and destroys if so.
 					if (HP <= 0.0f)
 					{
-						foreach (var callback in DeathCallbacks) callback();
+						foreach (var callback in DeathCallbacks)
+							callback(damageInfo);
+
 						Destroy(gameObject);
 					}
 					// Starts the flash coroutine if not dead.
