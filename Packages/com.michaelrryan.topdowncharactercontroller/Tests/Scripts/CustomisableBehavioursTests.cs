@@ -139,8 +139,12 @@ public class CustomisableBehavioursTests
         // Get's the default character's behaviour and ensures they have Melee Attack.
         CharacterBehaviour player = TestUtilities.GetDefaultCharactersBehaviour();
         Assert.NotNull(player.MeleeAttack);
+        Assert.NotNull(player.Health);
         player.MeleeAttack.AttackDamage = 1.0f;
         player.MeleeAttack.AttackCooldown = 0.0f;
+
+        // Gives the player a ridiculous amount of health so they don't die.
+        player.Health.HP = 10000000.0f;
 
         // Get's the enemy character's behaviour and ensures they have health.
         CharacterBehaviour enemy =

@@ -10,10 +10,23 @@ public class HealthTests
 {
 	// Variable and method used in DeathCallbacksAreRunOnDeath().
 	private bool _deathCallbackRun = false;
+	private Dictionary<string, string> _damageInfo = null;
+	private float _newPlayerHealth = 0.0f;
 
-	void DeathCallback()
+	void DeathCallback(Dictionary<string, string> damageInfo)
 	{
 		_deathCallbackRun = true;
+	}
+
+	void DeathCallbackWithInfo(Dictionary<string, string> damageInfo)
+	{
+		_damageInfo = damageInfo;
+	}
+
+	void HealthChangedCallback(float newHP, Dictionary<string, string> damageInfo)
+	{
+		_damageInfo = damageInfo;
+		_newPlayerHealth = newHP;
 	}
 
 	[SetUp]
@@ -217,6 +230,122 @@ public class HealthTests
 		health.TakeDamage(health.HP);
 		yield return null;
 		Assert.IsTrue(_deathCallbackRun);
+	}
+
+	[UnityTest]
+	public IEnumerator DeathCallbacksPassDamageInfo()
+	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Sets the info to null to start.
+		_damageInfo = null;
+
+		// Gets the character's health component and adds the callback.
+		Health health = GetDefaultCharacterHealth();
+		health.DeathCallbacks.Add(DeathCallbackWithInfo);
+
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+        // Kills the character and checks the callback was run next frame.
+        health.TakeDamage(health.HP, null, attackInfo);
+		yield return null;
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
+	}
+
+	[UnityTest]
+	public IEnumerator HealthChangedCallbacksAreRunWhenDamaged()
+	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+		_newPlayerHealth = 0.0f;
+
+		// Gets the character's health component and adds the callback.
+		Health health = GetDefaultCharacterHealth();
+		health.HealthChangedCallbacks.Add(HealthChangedCallback);
+
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		// Damages the character and checks the callback was run next frame.
+		health.TakeDamage(health.HP * 0.5f, null, attackInfo);
+		yield return null;
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
+
+		// Checks the new health is correct.
+		Assert.AreEqual(health.HP, _newPlayerHealth);
+	}
+
+	[UnityTest]
+	public IEnumerator HealthChangedCallbacksAreRunWhenHealed()
+	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+		_newPlayerHealth = 0.0f;
+
+		// Gets the character's health component and adds the callback.
+		Health health = GetDefaultCharacterHealth();
+		health.HealthChangedCallbacks.Add(HealthChangedCallback);
+
+		// Heals the character and checks the callback was run next frame.
+		health.HP += 5.0f;
+		yield return null;
+
+		// Checks the damage info is null.
+		Assert.Null(_damageInfo);
+
+		// Checks the new health is correct.
+		Assert.AreEqual(health.HP, _newPlayerHealth);
+	}
+
+	[UnityTest]
+	public IEnumerator HealthChangedCallbacksAreRunOnDeath()
+	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+		_newPlayerHealth = 0.0f;
+
+		// Gets the character's health component and adds the callback.
+		Health health = GetDefaultCharacterHealth();
+		health.HealthChangedCallbacks.Add(HealthChangedCallback);
+
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		// Kills the character and checks the callback was run next frame.
+		health.TakeDamage(health.HP, null, attackInfo);
+		yield return null;
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
+
+		// Checks the new health is correct.
+		Assert.AreEqual(0.0f, health.HP);
+		Assert.AreEqual(health.HP, _newPlayerHealth);
 	}
 
 	private Health GetDefaultCharacterHealth()

@@ -22,6 +22,8 @@ namespace TopdownCharacterController
 		public bool LimitedAmmo = false;
 		public int Ammo = 0;
 
+		public Dictionary<string, string> AttackInfo = new Dictionary<string, string>();
+
 		// ==== Private Variables ====
 
 		private const string RANGED_SPEED_MULTIPLIER = "RangedSpeedMultiplier";
@@ -54,9 +56,10 @@ namespace TopdownCharacterController
 				GameObject projectileObj =
 					Instantiate(projectilePrefab, transform.position, rotation);
 
-				// Gets the projectile component and assigns the shooters tag.
+				// Gets the projectile component and assigns the shooters tag and Attack Info.
 				Projectile projectile = projectileObj.GetComponent<Projectile>();
 				projectile.ShootersTag = tag;
+				projectile.AttackInfo = AttackInfo;
 
 				// Ensures the projectile doesn't collide with the shooter.
 				Collider2D projectCollider = projectile.GetComponent<Collider2D>();

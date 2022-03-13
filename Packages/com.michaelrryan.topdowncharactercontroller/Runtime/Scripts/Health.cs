@@ -8,7 +8,13 @@ namespace TopdownCharacterController
 	{
 		// ==== Properties ====
 
-		public float HP = 5.0f;
+		[SerializeField]
+		private float _HP = 5.0f;
+		public float HP
+        {
+			get { return _HP; }
+			set { SetHP(value); }
+        }
 
 		[SerializeField]
 		private float _damageGracePeriod = 0.8f;
@@ -21,8 +27,11 @@ namespace TopdownCharacterController
 		public int GracePeriodFlashes = 4;
 		public List<string> DamageWhitelistTags = new List<string>();
 
-		public delegate void DeathCallback();
+		public delegate void DeathCallback(Dictionary<string, string> damageInfo);
 		public List<DeathCallback> DeathCallbacks = new List<DeathCallback>();
+
+		public delegate void HealthChangedCallback (float newHP, Dictionary<string, string> changeInfo);
+		public List<HealthChangedCallback> HealthChangedCallbacks = new List<HealthChangedCallback>();
 
 		// ==== Private Variables ====
 
@@ -33,7 +42,7 @@ namespace TopdownCharacterController
 
 		// ==== Public Custom Methods ====
 
-		public bool TakeDamage(float damage, string attackersTag = null)
+		public bool TakeDamage(float damage, string attackersTag = null, Dictionary<string, string> damageInfo = null)
 		{
 			// Checks the grace period has elapsed.
 			if (Time.time >= _lastHitTaken + _damageGracePeriod)
@@ -46,12 +55,18 @@ namespace TopdownCharacterController
 				{
 					// Sets the new last hit taken time and takes the damage.
 					_lastHitTaken = Time.time;
-					HP -= damage;
+					_HP -= damage;
+
+					// Calls each of the health changed callbacks.
+					foreach (var callback in HealthChangedCallbacks)
+						callback(_HP, damageInfo);
 
 					// Checks if health has reached zero and destroys if so.
-					if (HP <= 0.0f)
+					if (_HP <= 0.0f)
 					{
-						foreach (var callback in DeathCallbacks) callback();
+						foreach (var callback in DeathCallbacks)
+							callback(damageInfo);
+
 						Destroy(gameObject);
 					}
 					// Starts the flash coroutine if not dead.
@@ -102,6 +117,15 @@ namespace TopdownCharacterController
 		{
 			_damageGracePeriod = value;
 			_lastHitTaken = Time.time - _damageGracePeriod * 2.0f;
+		}
+
+		private void SetHP(float value)
+        {
+			_HP = value;
+
+			// Calls each of the health changed callbacks.
+			foreach (var callback in HealthChangedCallbacks)
+				callback(_HP, null);
 		}
 	}
 }
