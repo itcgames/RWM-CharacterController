@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b96915f5f0f3ca2489e1dbaca1058fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HP: 3
+  _HP: 3
   _damageGracePeriod: 0.8
   GracePeriodFlashes: 4
   DamageWhitelistTags:
