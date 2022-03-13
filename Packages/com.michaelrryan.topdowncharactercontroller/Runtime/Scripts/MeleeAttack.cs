@@ -93,7 +93,7 @@ namespace TopdownCharacterController
 
 				// If a character health component was retrieved, damages it.
 				if (characterHealth)
-					characterHealth.TakeDamage(ThornsDamage, tag);
+					characterHealth.TakeDamage(ThornsDamage, tag, AttackInfo);
 			}
 		}
 

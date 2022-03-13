@@ -10,7 +10,8 @@ public class TestUtilities
 	public const string DEFAULT_ENEMY_NAME = "Enemy";
 	public const string DEFAULT_SCENE_NAME = "ZeldaDemoScene";
 	public const string TILEBASED_SCENE_NAME = "ZeldaTilebasedDemoScene";
-	public const string PROJECTILE_NAME = "BasicProjectile(Clone)";
+	public const string PROJECTILE_INSTANCE_NAME = "BasicProjectile(Clone)";
+	public const string PROJECTILE_TAG = "Projectile";
 
 	public static CharacterBehaviour GetBehaviourByCharacterName(string name)
     {
@@ -48,5 +49,9 @@ public class TestUtilities
 		Assert.NotNull(enemy.Movement);
 		enemy.enabled = false;
 		enemy.Movement.ClearPersistentInput();
+
+		GameObject[] projectiles = GameObject.FindGameObjectsWithTag(PROJECTILE_TAG);
+		foreach (GameObject projectile in projectiles)
+            Object.Destroy(projectile);
 	}
 }
