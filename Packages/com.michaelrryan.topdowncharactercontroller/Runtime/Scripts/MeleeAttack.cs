@@ -23,6 +23,8 @@ namespace TopdownCharacterController
 		public float ThornsDamage = 0.0f;
 		public bool FreezeOnAttack = false;
 
+		public Dictionary<string, string> AttackInfo = new Dictionary<string, string>();
+
 		// ==== Private Variables ====
 
 		private const string MELEE_SPEED_MULTIPLIER = "MeleeSpeedMultiplier";
@@ -50,7 +52,7 @@ namespace TopdownCharacterController
 				foreach (Collider2D collider in colliders)
 				{
 					Health characterHealth = collider.GetComponent<Health>();
-					if (characterHealth) characterHealth.TakeDamage(AttackDamage, tag);
+					if (characterHealth) characterHealth.TakeDamage(AttackDamage, tag, AttackInfo);
 				}
 
 				if (FreezeOnAttack && _rb)
