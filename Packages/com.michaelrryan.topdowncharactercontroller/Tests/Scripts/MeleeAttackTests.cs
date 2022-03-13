@@ -315,4 +315,56 @@ public class MeleeAttackTests
 		Assert.NotNull(_damageInfo);
 		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
 	}
+
+	[UnityTest]
+	public IEnumerator AttackInfoIsPassedThroughWithThornsDamage()
+	{
+		// Disables the enemy to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		// SETS UP THE CHARACTERS.
+		const float HEALTH = 2.0f;
+		const float DAMAGE_GRACE_PERIOD = 0.2f;
+		const float ENEMY_THORNS_DAMAGE = 0.5f;
+
+		// Gets the character behaviours.
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
+
+		CharacterBehaviour enemy =
+			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+
+		Assert.NotNull(player.Health);
+		Assert.NotNull(enemy.MeleeAttack);
+
+		// Sets the player and enemy properties.
+		player.Health.HP = HEALTH;
+		player.Health.DamageGracePeriod = DAMAGE_GRACE_PERIOD;
+		enemy.MeleeAttack.ThornsDamage = ENEMY_THORNS_DAMAGE;
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+
+		// Assigns the attack info to the melee attack.
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		enemy.MeleeAttack.AttackInfo = attackInfo;
+
+		// Assigns the callback.
+		player.Health.HealthChangedCallbacks.Add(HealthChangedCallback);
+
+		// CHECKS THE PLAYER TAKES THORNS DAMAGE.
+		// Positions the player on the enemy, waits half the damage grace period..
+		player.transform.position = enemy.transform.position;
+		yield return new WaitForSeconds(DAMAGE_GRACE_PERIOD * 0.5f);
+		Assert.AreEqual(HEALTH - ENEMY_THORNS_DAMAGE, player.Health.HP);
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
+	}
 }
