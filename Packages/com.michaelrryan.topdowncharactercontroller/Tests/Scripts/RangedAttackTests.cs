@@ -14,6 +14,18 @@ public class RangedAttackTests
 	//		to elapse to avoid falling under on different powered machines.
 	const float SAFETY_MARGIN = 0.1f;
 
+	private Dictionary<string, string> _damageInfo;
+
+	private void HealthChangedCallback(float newHealth, Dictionary<string, string> damageInfo)
+	{
+		_damageInfo = damageInfo;
+	}
+
+	private void DeathCallback(Dictionary<string, string> damageInfo)
+	{
+		_damageInfo = damageInfo;
+	}
+
 	[SetUp]
 	public void Setup()
 	{
@@ -172,6 +184,104 @@ public class RangedAttackTests
 		Assert.AreEqual(0, rangedAttack.Ammo);
 		GameObject failed = rangedAttack.Fire(Vector2.right);
 		Assert.Null(failed);
+	}
+
+	[UnityTest]
+	public IEnumerator AttackInfoIsPassedThroughHealthChangedCallbacks()
+	{
+		// Disables the enemy behaviour to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		const float PROJECTILE_DISTANCE = 2.0f;
+
+		// Gets the enemy character's behaviour.
+		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+		Assert.NotNull(enemy.Health);
+
+		// Gets the player's ranged attack component and checks it's not null.
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		Assert.NotNull(rangedAttack);
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+
+		// Assigns the attack info to the melee attack.
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		rangedAttack.AttackInfo = attackInfo;
+
+		// Assigns the callback.
+		enemy.Health.HealthChangedCallbacks.Add(HealthChangedCallback);
+
+		// Positions the player to the left of the enemy.
+		rangedAttack.transform.position =
+			enemy.transform.position + Vector3.left * PROJECTILE_DISTANCE;
+
+		// Gets the projectile component from the fired projectile.
+		GameObject projectileObj = rangedAttack.Fire(Vector2.right);
+		Projectile projectile = projectileObj.GetComponent<Projectile>();
+
+		// Gets the enemies health and waits for the bullet to hit.
+		float enemyHP = enemy.Health.HP;
+		yield return new WaitForSeconds((PROJECTILE_DISTANCE / projectile.Speed)
+			+ SAFETY_MARGIN);
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
+	}
+
+	[UnityTest]
+	public IEnumerator AttackInfoIsPassedThroughDeathCallbacks()
+	{
+		// Disables the enemy behaviour to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		const float PROJECTILE_DISTANCE = 2.0f;
+
+		// Gets the player's ranged attack component and checks it's not null.
+		RangedAttack rangedAttack = GetDefaultRangedAttackComponent();
+		Assert.NotNull(rangedAttack);
+
+		// Gets the enemy character's behaviour and sets its health to the projectile damage.
+		CharacterBehaviour enemy = TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+		Assert.NotNull(enemy.Health);
+
+		Projectile projectile = rangedAttack.projectilePrefab.GetComponent<Projectile>();
+		Assert.NotNull(projectile);
+		enemy.Health.HP = projectile.Damage;
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+
+		// Assigns the attack info to the melee attack.
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		rangedAttack.AttackInfo = attackInfo;
+
+		// Assigns the callback.
+		enemy.Health.DeathCallbacks.Add(DeathCallback);
+
+		// Positions the player to the left of the enemy.
+		rangedAttack.transform.position =
+			enemy.transform.position + Vector3.left * PROJECTILE_DISTANCE;
+
+		// Fires the projectile and waits for it to hit.
+		rangedAttack.Fire(Vector2.right);
+		yield return new WaitForSeconds((PROJECTILE_DISTANCE / projectile.Speed)
+			+ SAFETY_MARGIN);
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
 	}
 
 	private RangedAttack GetDefaultRangedAttackComponent()

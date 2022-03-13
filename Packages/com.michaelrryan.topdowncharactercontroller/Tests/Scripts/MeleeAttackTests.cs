@@ -10,6 +10,18 @@ public class MeleeAttackTests
 {
 	const string NPC_NAME = "Enemy";
 
+	private Dictionary<string, string> _damageInfo;
+
+	private void HealthChangedCallback(float newHealth, Dictionary<string, string> damageInfo)
+    {
+		_damageInfo = damageInfo;
+	}
+
+	private void DeathCallback(Dictionary<string, string> damageInfo)
+	{
+		_damageInfo = damageInfo;
+	}
+
 	[SetUp]
 	public void Setup()
 	{
@@ -195,5 +207,112 @@ public class MeleeAttackTests
 		//		now changed.
 		yield return new WaitForSeconds(ATTACK_COOLDOWN);
 		Assert.AreNotEqual(position, player.transform.position);
+	}
+
+	[UnityTest]
+	public IEnumerator AttackInfoIsPassedThroughHealthChangedCallbacks()
+	{
+		// Disables the enemy behaviour to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		const float ATTACK_RADIUS = 1.0f;
+		const float ATTACK_DAMAGE = 1.0f;
+		const float ENEMY_HEALTH = 2.0f;
+
+		// Gets the character behaviours.
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
+
+		CharacterBehaviour enemy =
+			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+
+		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(enemy.Health);
+
+		// Sets the attack radius, attack damage, and enemy health.
+		player.MeleeAttack.AttackRadius = ATTACK_RADIUS;
+		player.MeleeAttack.AttackDamage = ATTACK_DAMAGE;
+		enemy.Health.HP = ENEMY_HEALTH;
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+
+		// Assigns the attack info to the melee attack.
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		player.MeleeAttack.AttackInfo = attackInfo;
+
+		// Assigns the callback.
+		enemy.Health.HealthChangedCallbacks.Add(HealthChangedCallback);
+
+		// Positions the enemy.
+		enemy.transform.position = player.transform.position
+			+ Vector3.right * ATTACK_RADIUS;
+		yield return null;
+
+		// Attacks and waits a frame.
+		player.MeleeAttack.Attack(Vector2.right);
+		yield return null;
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
+	}
+
+	[UnityTest]
+	public IEnumerator AttackInfoIsPassedThroughDeathCallbacks()
+	{
+		// Disables the enemy behaviour to prevent unwanted behaviour.
+		TestUtilities.DisableEnemy();
+
+		const float ATTACK_RADIUS = 1.0f;
+		const float ENEMY_HEALTH = 2.0f;
+
+		// Gets the character behaviours.
+		CharacterBehaviour player =
+			TestUtilities.GetDefaultCharactersBehaviour();
+
+		CharacterBehaviour enemy =
+			TestUtilities.GetBehaviourByCharacterName(NPC_NAME);
+
+		Assert.NotNull(player.MeleeAttack);
+		Assert.NotNull(enemy.Health);
+
+		// Sets the attack radius, attack damage, and enemy health.
+		player.MeleeAttack.AttackRadius = ATTACK_RADIUS;
+		player.MeleeAttack.AttackDamage = ENEMY_HEALTH;
+		enemy.Health.HP = ENEMY_HEALTH;
+
+		// Initialises the checker variables.
+		_damageInfo = null;
+
+		// Assigns the attack info to the melee attack.
+		const string KEY_NAME = "test_key";
+		const string VALUE_NAME = "test_value";
+
+		Dictionary<string, string> attackInfo = new Dictionary<string, string>();
+		attackInfo.Add(KEY_NAME, VALUE_NAME);
+
+		player.MeleeAttack.AttackInfo = attackInfo;
+
+		// Assigns the callback.
+		enemy.Health.DeathCallbacks.Add(DeathCallback);
+
+		// Positions the enemy.
+		enemy.transform.position = player.transform.position
+			+ Vector3.right * ATTACK_RADIUS;
+		yield return null;
+
+		// Attacks and waits a frame.
+		player.MeleeAttack.Attack(Vector2.right);
+		yield return null;
+
+		// Checks the damage info was passed through correctly.
+		Assert.NotNull(_damageInfo);
+		Assert.AreEqual(VALUE_NAME, _damageInfo[KEY_NAME]);
 	}
 }

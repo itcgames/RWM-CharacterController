@@ -10,6 +10,7 @@ namespace TopdownCharacterController
 		public float Damage = 1.0f;
 		public float ExpireTime = 5.0f; // The time before the bullet destroys itself.
 		public string ShootersTag = ""; // The tag of the shooter.
+		public Dictionary<string, string> AttackInfo = new Dictionary<string, string>();
 
 		private void Start()
 		{
@@ -44,7 +45,7 @@ namespace TopdownCharacterController
 			// If a character health was found, damages it.
 			if (characterHealth)
 			{
-				bool damaged = characterHealth.TakeDamage(Damage, ShootersTag);
+				bool damaged = characterHealth.TakeDamage(Damage, ShootersTag, AttackInfo);
 
 				// If damage was done, destroys this object.
 				if (damaged)
